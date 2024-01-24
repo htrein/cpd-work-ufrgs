@@ -1,0 +1,33 @@
+COISAS QUE O TRABALHO DE CPD DEVE CONTER!
+
+1. Dados salvos em arquivos devem estar em BINARIO.
+
+2. Extraçao de dados brutos - DONE
+   
+   Preparacao dos dados brutos - Not DONE
+   / separar dados do arquivo com dados brutos
+     em arquivos com os dados escolhidos como 
+     industria por exemplo. Por fim, geramos
+     em binario a partir desses arquivos que foram
+     separados./
+
+    Armazenamento em estruturas de arquivos - Not DONE
+    / Aqui seria criar binário a partir dos arquivos
+      com os dados já separados. O arquivo deve ser feito
+      de modo SEQUENCIAL ou SERIAL com índices de acesso
+      do tipo B/B+ ou TRIE/PATRICIA de modo a facilitar
+      a consulta dos dados /
+
+3. O programa deve permitir ao usuário:
+   3.1 - Busca rápida, usuário sabendo o índice de determinado
+         dado de interesse, pode acessá-lo diretamente.
+   3.2 - Filtrar, dado as opções fornecidas pela aplicação
+         como, por exemplo, por tempo minimo de experiencia.
+   3.3 - Acrescentar, remover, atualizar dados dos arquivos.
+
+4. Três funcionalidades obrigatórias:
+   4.1 - resultado das buscas devem ser PAGINADOS.
+   4.2 - Analitics(básico)
+   4.3 - Opcao de REORDENACAO do resultado.
+
+   

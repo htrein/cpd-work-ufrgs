@@ -14,8 +14,14 @@ int main()
         system("cls");
         printf("--JOBS SEARCH ENGINE--\n");
         printf("(0) Atualizar arquivo fonte\n");
-        printf("(1) Busca livre\n");
-        printf("(2) Busca por perfil\n");
+        /* O nome na verdade é busca rápida, e é feito
+         de acordo com índice de determinado registro
+         em um arquivo que o usuário quer consultar.*/
+        printf("(1) Busca Rapida\n");
+        /* Acredito que o melhor nome seria busca com filtros,
+           onde sugerimos determinados filtros para classicaar
+           as vagas de emprego */
+        printf("(2) Busca por Filtro\n");
         printf("(3) Analise estatistica\n");
         scanf("%d", &option);
     }
@@ -40,6 +46,8 @@ int main()
     case 2:
         printf("--BUSCA POR PERFIL--");
         break;
+    // Análise estatística só faz sentido depois de realizar uma Busca!
+    /*
     case 3:
         do
         {
@@ -52,11 +60,11 @@ int main()
         while(option_analytics!=1&&option_analytics!=2);
 
         break;
+    */
     default:
         printf("default");
         break;
     }
-
 
     return 0;
 }
