@@ -1,0 +1,16 @@
+# depslib dependency file v1.0
+1706297276 source:c:\users\a_alc\onedrive\Área de trabalho\repositorios\cpd-work-ufrgs\app_jobs\app_jobs.c
+	"app_jobs.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+
+1706297247 c:\users\a_alc\onedrive\Área de trabalho\repositorios\cpd-work-ufrgs\app_jobs\app_jobs.h
+	<stdbool.h>
+
+1706296862 source:c:\users\a_alc\onedrive\Área de trabalho\repositorios\cpd-work-ufrgs\app_jobs\main.c
+	"app_jobs.h"
+	<stdio.h>
+	<stdlib.h>
+	<stdbool.h>
+
