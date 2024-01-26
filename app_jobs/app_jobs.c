@@ -25,7 +25,9 @@ Node* createNode() {
 
     for (int i = 0; i < 2 * ORDER; i++) {
         newNode->children[i] = NULL;
-        newNode->keys[i] = 0;
+        //newNode->keys[i] = 0;
+        newNode->registros[i].key = 0;  // NAO SEI SE VAI FUNCIONAR!
+        newNode->registros[i].pos = 0;  // NAO SEI SE VAI FUNCIONAR!
     }
 
     return newNode;
@@ -33,12 +35,17 @@ Node* createNode() {
 
 // Função para dividir um nó filho do pai
 void splitChild(Node* parent, int index, Node* child) {
+    /* NODO FILHO A DIREITA CRIADO */
     Node* newChild = createNode();
     newChild->is_leaf = child->is_leaf;
     newChild->num_keys = ORDER - 1;
 
-    for (int i = 0; i < ORDER - 1; i++)
-        newChild->keys[i] = child->keys[i + ORDER];
+    // DIVIDE AS CHAVES ENTRE NODOS FILHOS
+    for (int i = 0; i < ORDER - 1; i++){
+        //newChild->keys[i] = child->keys[i + ORDER];
+        newChild->registro[i].key = child->registro[i + ORDER].key; //NAO SEI SE FUNCIONA
+        newChild->registro[i].pos = child->registro[i + ORDER].pos; //NAO SEI SE FUNCIONA
+    }
 
     if (!child->is_leaf) {
         for (int i = 0; i < ORDER; i++)
@@ -52,26 +59,39 @@ void splitChild(Node* parent, int index, Node* child) {
 
     parent->children[index + 1] = newChild;
 
-    for (int i = parent->num_keys - 1; i >= index; i--)
-        parent->keys[i + 1] = parent->keys[i];
-
-    parent->keys[index] = child->keys[ORDER - 1];
+    // O QUE FAZ? NAO SEI, POREM VOU TENTAR SOMENTE SUBSTITUIR PELO NOVO TIPO
+    for (int i = parent->num_keys - 1; i >= index; i--){
+        //parent->keys[i + 1] = parent->keys[i];
+        parent->registro[i + 1].key = parent->registro[i].key; //NAO SEI SE FUNCIONA
+        parent->registro[i + 1].pos = parent->registro[i].pos; //NAO SEI SE FUNCIONA
+    }
+    // O MESMO ALI DE CIMA!
+    //parent->keys[index] = child->keys[ORDER - 1];
+    parent->registro[index].key = child->registro[ORDER - 1].key; //NAO SEI SE FUNCIONA
+    parent->registro[index].pos = child->registro[ORDER - 1].pos; //NAO SEI SE FUNCIONA
     parent->num_keys++;
 }
 
 // Função para inserir uma chave em uma árvore B
-void insert(Node** root, int key) {
+/* AO INVES DE INT KEY COLOCAMOS KEYPOS registro */
+void insert(Node** root, KEYPOS reg) {
     Node* temp = *root;
 
+    /* CASO RAIZ VAZIA */
     if (temp == NULL) {
         *root = createNode();
-        (*root)->keys[0] = key;
+        /* NAO ADICIONAMOS MAIS SOMENTE KEY, E SIM, KEY E POS*/
+        //(*root)->keys[0] = key;
+        (*root)->registro[0].key = reg.key; //NAO TENHO CERTEZA SE VA FUNCIONAR
+        (*root)->registro[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
         (*root)->num_keys = 1;
     } else {
+        /* CASO NODO ESTIVER CHEIO */
         if (temp->num_keys == 2 * ORDER - 1) {
             Node* newRoot = createNode();
             newRoot->is_leaf = false;
             newRoot->children[0] = *root;
+            /* FUNCAO QUE DIVIDE O NODO CHEIO */
             splitChild(newRoot, 0, *root);
             int i = 0;
             if (newRoot->keys[0] < key)
