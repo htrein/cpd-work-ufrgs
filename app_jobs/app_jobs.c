@@ -79,44 +79,70 @@ void insert(Node** root, KEYPOS reg) {
 
     /* CASO RAIZ VAZIA */
     if (temp == NULL) {
+
         *root = createNode();
         /* NAO ADICIONAMOS MAIS SOMENTE KEY, E SIM, KEY E POS*/
         //(*root)->keys[0] = key;
         (*root)->registro[0].key = reg.key; //NAO TENHO CERTEZA SE VA FUNCIONAR
         (*root)->registro[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
         (*root)->num_keys = 1;
+
     } else {
         /* CASO NODO ESTIVER CHEIO */
         if (temp->num_keys == 2 * ORDER - 1) {
+
             Node* newRoot = createNode();
             newRoot->is_leaf = false;
             newRoot->children[0] = *root;
+
             /* FUNCAO QUE DIVIDE O NODO CHEIO */
             splitChild(newRoot, 0, *root);
             int i = 0;
-            if (newRoot->keys[0] < key)
+
+            /* O REGISTRO A SER INSERIDO NAO SERÁ INSERIDO NA NOVA RAIZ E SIM EM UM DOS FILHOS
+               POR ISSO A CHAMADA RECURSIVA ABAIXO*/
+
+            /* POR QUE I = 0 OU I = 1? POIS UMA NOVA RAIZ SEMPRE TEM 2 FILHOS */
+
+            /*if (newRoot->keys[0] < key)
                 i++;
-            insert(&newRoot->children[i], key);
+            */
+
+            if (newRoot->registro[0].key < reg.key) // NAO SEI SE FUNCIONA
+                i++;
+
+            // CHAMADA RECURSIVA
+            insert(&newRoot->children[i], reg); // SOMENTE TROQUEI key -> reg
             *root = newRoot;
+
         } else {
+
+            /* CASO O NODO NAO ESTIVER CHEIO */
+            // FAÇA ENQUANTO NAO EH FOLHA
             while (!temp->is_leaf) {
+
                 int i = temp->num_keys - 1;
-                while (i >= 0 && temp->keys[i] > key)
+
+                //
+                while (i >= 0 && temp->registro[i].key > reg.key) // temp->keys[i] vira temp->registro[i].key, key vira reg.key
                     i--;
                 i++;
+
                 if (temp->children[i]->num_keys == 2 * ORDER - 1) {
                     splitChild(temp, i, temp->children[i]);
-                    if (temp->keys[i] < key)
+                    if (temp->registro[i].key < reg.key)          // temp->keys[i] < key vira temp->registro[i].key < reg.key
                         i++;
                 }
                 temp = temp->children[i];
             }
+
             int i = temp->num_keys - 1;
-            while (i >= 0 && temp->keys[i] > key) {
-                temp->keys[i + 1] = temp->keys[i];
+            while (i >= 0 && temp->registro[i].key > reg.key) {               // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
+                temp->registro[i + 1].key = temp->registro[i].key;            // temp->keys[i + 1] = temp->keys[i] vira temp->registro[i + 1].key = temp->registro[i].key;
                 i--;
             }
-            temp->keys[i + 1] = key;
+            //temp->keys[i + 1] = key;
+            temp->registro[i + 1].key = reg.key;
             temp->num_keys++;
         }
     }
@@ -128,7 +154,8 @@ void traverse(Node* root) {
         int i;
         for (i = 0; i < root->num_keys; i++) {
             traverse(root->children[i]);
-            printf("%d ", root->keys[i]);
+            //printf("%d ", root->keys[i]);
+            printf("ch:%d, pos:%d\n", root->registro[i].key, root->registro[i].pos ); //TESTANDO
         }
         traverse(root->children[i]);
     }
