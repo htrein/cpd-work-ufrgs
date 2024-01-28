@@ -11,18 +11,23 @@
 
 /* MAIN FUNCTION -------------------------------------------------------*/
 
-
+// MAIN PARA TESTAR SE A ARVORE B ESTÁ DE FATO FUNCIONANDO, SIM ELA ESTÁ.
+/*
 int main() {
     Node* root = NULL;
+    KEYPOS reg;
 
-    insert(&root, 10);
-    insert(&root, 20);
-    insert(&root, 5);
-    insert(&root, 6);
-    insert(&root, 12);
-    insert(&root, 30);
-    insert(&root, 7);
-    insert(&root, 17);
+    reg.key = 10;
+    reg.pos = 10;
+
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
+    insert(&root, reg);
 
     printf("Traversal of the constructed tree: \n");
     traverse(root);
@@ -31,8 +36,8 @@ int main() {
     return 0;
 }
 
+*/
 
-/*
 int main()
 {
     int option;
@@ -84,4 +89,3 @@ int main()
 
     return 0;
 }
-*/

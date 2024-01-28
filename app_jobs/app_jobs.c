@@ -8,7 +8,7 @@
 
 /* CONSTANTES ---------------------------------------------------------*/
 
-#define ORDER 2
+#define ORDER 2 //
 
 /* FUNCOES --------------------------------------------------------------*/
 
@@ -43,8 +43,8 @@ void splitChild(Node* parent, int index, Node* child) {
     // DIVIDE AS CHAVES ENTRE NODOS FILHOS
     for (int i = 0; i < ORDER - 1; i++){
         //newChild->keys[i] = child->keys[i + ORDER];
-        newChild->registro[i].key = child->registro[i + ORDER].key; //NAO SEI SE FUNCIONA
-        newChild->registro[i].pos = child->registro[i + ORDER].pos; //NAO SEI SE FUNCIONA
+        newChild->registros[i].key = child->registros[i + ORDER].key; //NAO SEI SE FUNCIONA
+        newChild->registros[i].pos = child->registros[i + ORDER].pos; //NAO SEI SE FUNCIONA
     }
 
     if (!child->is_leaf) {
@@ -62,18 +62,18 @@ void splitChild(Node* parent, int index, Node* child) {
     // O QUE FAZ? NAO SEI, POREM VOU TENTAR SOMENTE SUBSTITUIR PELO NOVO TIPO
     for (int i = parent->num_keys - 1; i >= index; i--){
         //parent->keys[i + 1] = parent->keys[i];
-        parent->registro[i + 1].key = parent->registro[i].key; //NAO SEI SE FUNCIONA
-        parent->registro[i + 1].pos = parent->registro[i].pos; //NAO SEI SE FUNCIONA
+        parent->registros[i + 1].key = parent->registros[i].key; //NAO SEI SE FUNCIONA
+        parent->registros[i + 1].pos = parent->registros[i].pos; //NAO SEI SE FUNCIONA
     }
     // O MESMO ALI DE CIMA!
     //parent->keys[index] = child->keys[ORDER - 1];
-    parent->registro[index].key = child->registro[ORDER - 1].key; //NAO SEI SE FUNCIONA
-    parent->registro[index].pos = child->registro[ORDER - 1].pos; //NAO SEI SE FUNCIONA
+    parent->registros[index].key = child->registros[ORDER - 1].key; //NAO SEI SE FUNCIONA
+    parent->registros[index].pos = child->registros[ORDER - 1].pos; //NAO SEI SE FUNCIONA
     parent->num_keys++;
 }
 
 // Função para inserir uma chave em uma árvore B
-/* AO INVES DE INT KEY COLOCAMOS KEYPOS registro */
+/* AO INVES DE INT key COLOCAMOS KEYPOS registro */
 void insert(Node** root, KEYPOS reg) {
     Node* temp = *root;
 
@@ -83,8 +83,8 @@ void insert(Node** root, KEYPOS reg) {
         *root = createNode();
         /* NAO ADICIONAMOS MAIS SOMENTE KEY, E SIM, KEY E POS*/
         //(*root)->keys[0] = key;
-        (*root)->registro[0].key = reg.key; //NAO TENHO CERTEZA SE VA FUNCIONAR
-        (*root)->registro[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
+        (*root)->registros[0].key = reg.key; //NAO TENHO CERTEZA SE VA FUNCIONAR
+        (*root)->registros[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
         (*root)->num_keys = 1;
 
     } else {
@@ -108,7 +108,7 @@ void insert(Node** root, KEYPOS reg) {
                 i++;
             */
 
-            if (newRoot->registro[0].key < reg.key) // NAO SEI SE FUNCIONA
+            if (newRoot->registros[0].key < reg.key) // NAO SEI SE FUNCIONA
                 i++;
 
             // CHAMADA RECURSIVA
@@ -121,28 +121,34 @@ void insert(Node** root, KEYPOS reg) {
             // FAÇA ENQUANTO NAO EH FOLHA
             while (!temp->is_leaf) {
 
-                int i = temp->num_keys - 1;
+                int i = temp->num_keys - 1; // i, vira um índice do nodo que contem as chaves
 
-                //
-                while (i >= 0 && temp->registro[i].key > reg.key) // temp->keys[i] vira temp->registro[i].key, key vira reg.key
+                // procurando posicao do filho da chave(registrador) i na qual verificar se é folha para inserir.
+                while (i >= 0 && temp->registros[i].key > reg.key) // temp->keys[i] vira temp->registro[i].key, key vira reg.key
                     i--;
                 i++;
 
                 if (temp->children[i]->num_keys == 2 * ORDER - 1) {
                     splitChild(temp, i, temp->children[i]);
-                    if (temp->registro[i].key < reg.key)          // temp->keys[i] < key vira temp->registro[i].key < reg.key
+                    if (temp->registros[i].key < reg.key)          // temp->keys[i] < key vira temp->registro[i].key < reg.key
                         i++;
                 }
                 temp = temp->children[i];
             }
 
+            // AQUI SABEMOS QUE O NODO É FOLHA, ENTAO SOMENTE RESTA A INSERCAO.
             int i = temp->num_keys - 1;
-            while (i >= 0 && temp->registro[i].key > reg.key) {               // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
-                temp->registro[i + 1].key = temp->registro[i].key;            // temp->keys[i + 1] = temp->keys[i] vira temp->registro[i + 1].key = temp->registro[i].key;
+            while (i >= 0 && temp->registros[i].key > reg.key) {                // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
+                temp->registros[i + 1].key = temp->registros[i].key;            // temp->keys[i + 1] = temp->keys[i] vira temp->registro[i + 1].key = temp->registro[i].key;
+                // ACREDITO SER NECESSARIO DESLOCAR A POSICAO TAMBEM.
+                // ISSO ABAIXO É UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+                temp->registros[i + 1].pos = temp->registros[i].pos;
                 i--;
             }
             //temp->keys[i + 1] = key;
-            temp->registro[i + 1].key = reg.key;
+            temp->registros[i + 1].key = reg.key;
+            // ISSO ABAIXO É UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+            temp->registros[i + 1].pos = reg.pos;
             temp->num_keys++;
         }
     }
@@ -155,7 +161,7 @@ void traverse(Node* root) {
         for (i = 0; i < root->num_keys; i++) {
             traverse(root->children[i]);
             //printf("%d ", root->keys[i]);
-            printf("ch:%d, pos:%d\n", root->registro[i].key, root->registro[i].pos ); //TESTANDO
+            printf("ch:%d, pos:%d\n", root->registros[i].key, root->registros[i].pos ); //TESTANDO
         }
         traverse(root->children[i]);
     }

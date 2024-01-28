@@ -51,7 +51,7 @@ typedef struct{
 // chave-posicao, armazena chave e posicao do registro que queremos
 typedef struct keyPos{
     int key;
-    int pos:
+    int pos;
 }KEYPOS;
 
 /* tipo NODO */
@@ -69,6 +69,7 @@ typedef struct node {
 
 Node* createNode();
 void splitChild(Node* parent, int index, Node* child);
-void insert(Node** root, int key);
+//void insert(Node** root, int key);
+void insert(Node** root, KEYPOS reg);
 void traverse(Node* root);
 
