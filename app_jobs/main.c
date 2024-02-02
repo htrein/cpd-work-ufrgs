@@ -1,15 +1,22 @@
-/* BIBLIOTECAS -------------------------------------------------------*/
+//--------------------------------------------------------------------
+// BIBLIOTECAS
+//--------------------------------------------------------------------
 
 #include "app_jobs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
 
-/* CONSTANTES ---------------------------------------------------------*/
+//--------------------------------------------------------------------
+// CONSTANTES
+//--------------------------------------------------------------------
 
 #define ORDER 2
 
+//--------------------------------------------------------------------
 // ESTRUTURAS
+//--------------------------------------------------------------------
+
 typedef struct
 {
     char nome[1000];
@@ -63,16 +70,44 @@ typedef struct
     char nome_localizacao[1000];
     char descricao[10000];
     char website[100];
-    char especializacao[1000];//checar se os tamanhos são os mesmos usados na criacao dos binários!
+    char especializacao[1000]; //checar se os tamanhos sï¿½o os mesmos usados na criacao dos binï¿½rios!
     char qualificacao[1000];
     char habilidades[5000];
     char yoe[100];
     char data_criacao[100];
 } REGISTRO;
 
-/* MAIN FUNCTION -------------------------------------------------------*/
+// chave-posicao, armazena chave e posicao do registro que queremos
+typedef struct keyPos{
+    int key;
+    int pos;
+}KEYPOS;
 
-// MAIN PARA TESTAR SE A ARVORE B ESTÁ DE FATO FUNCIONANDO, SIM ELA ESTÁ.
+// Definindo a estrutura de um nï¿½ da ï¿½rvore B
+typedef struct node {
+    //int keys[2 * ORDER - 1];
+    KEYPOS registros[2 * ORDER - 1];    // registros com chaves-posicoes dos arquivos
+    struct node *children[2 * ORDER];
+    int num_keys;
+    bool is_leaf;                       // ï¿½ folha
+} Node;
+
+//--------------------------------------------------------------------
+// PROTOTIPOS
+//--------------------------------------------------------------------
+
+Node* createNode();
+void splitChild(Node* parent, int index, Node* child);
+//void insert(Node** root, int key);
+void insert(Node** root, KEYPOS reg);
+void traverse(Node* root);
+KEYPOS* search(Node* root, int key);
+
+//--------------------------------------------------------------------
+// MAIN FUNCTION
+//--------------------------------------------------------------------
+
+// MAIN PARA TESTAR SE A ARVORE B ESTï¿½ DE FATO FUNCIONANDO, SIM ELA ESTï¿½.
 /*
 int main() {
     Node* root = NULL;
@@ -149,6 +184,10 @@ int main()
             return 1;
         }
 
+        // ...
+
+        fclose("dataset.csv");
+
     case 1:
         do
         {
@@ -176,7 +215,19 @@ int main()
             FILE* arqcrit = fopen("dataset.csv", "rb"); //TEM QUE COLOCAR OS NOMES DOS ARQUIVOS CORRETAMENTE
 
             //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
-            XXXXXXXXXXXXXXXXXXXXX
+            KEYPOS resultado; 
+
+            resultado.pos = search(arqemp, key_busca); // nao sei se isso funciona
+
+            if (resultado.pos == NULL)  // se a busca retornou NULL
+            {
+                printf("Empresa nao encontrada\n");
+            }
+            else
+            {
+                pos_emp = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+            }
+
             //le arquivo de empresas na posicao de memoria previamente encontrada e printa os campos
             if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
             {
@@ -198,8 +249,8 @@ int main()
                 fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                 strcpy(reg.nome_industria, ind.nome);
             }
-            //faz um "SearchTree" para a tree de ofertas e procura pelo empresa.id e retorna o cargo.id, é preciso tambem retornar a data de criacao!!! //REPETIR ESSE PROCESSO ATÉ QUE TODOS OS CARGOS TENHAM SIDO LIDOS
-            //a partir daqui tudo é dentro de um do{} while todos nodos com o empresa.id tenham sido encontrados e tratados
+            //faz um "SearchTree" para a tree de ofertas e procura pelo empresa.id e retorna o cargo.id, ï¿½ preciso tambem retornar a data de criacao!!! //REPETIR ESSE PROCESSO ATï¿½ QUE TODOS OS CARGOS TENHAM SIDO LIDOS
+            //a partir daqui tudo ï¿½ dentro de um do{} while todos nodos com o empresa.id tenham sido encontrados e tratados
             XXXXXXXXXXXXXXXX
             //faz um "SearchTree" para a tree de cargos e procura pelo cargo.id e retorna a posicao de memoria do cargo
             XXXXXXXXXXXXXXXX
@@ -214,7 +265,7 @@ int main()
                 strcpy(reg.nome_cargo, carg.nome);
                 strcpy(reg.descricao, carg.descricao);
             }
-            //le o arquivo de localização na posicao cargos.id_est_loc e printa os campos
+            //le o arquivo de localizaï¿½ï¿½o na posicao cargos.id_est_loc e printa os campos
             if(fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
             {
                 printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
@@ -224,7 +275,7 @@ int main()
                 fread(&loc, sizeof(LOCALIZACAO), 1, arqloc);
                 strcpy(reg.nome_localizacao, loc.nome);
             }
-            //le o arquivo de critérios da posicao cargos.id_est_crit e printa os campos
+            //le o arquivo de critï¿½rios da posicao cargos.id_est_crit e printa os campos
             if(fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
             {
                 printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
@@ -241,7 +292,7 @@ int main()
                 printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
             else
             {
-                printf("\n\nVocê gostaria de ver mais resultados?\n");
+                printf("\n\nVocï¿½ gostaria de ver mais resultados?\n");
                 printf("(1) Sim \t\t (2) Nao\n\n");
                 scanf("%d", &op_pag);
             }
@@ -253,7 +304,7 @@ int main()
 
             //while(op_pag!=2 || Xxxxx);
 
-            //aqui é o final do do - while e é onde é preciso printar, para que a struct possa ser sobrescrita com o que é relacionado a cargo
+            //aqui ï¿½ o final do do - while e ï¿½ onde ï¿½ preciso printar, para que a struct possa ser sobrescrita com o que ï¿½ relacionado a cargo
             fclose(arqemp);
             fclose(arqind);
             fclose(arqof);
@@ -288,7 +339,7 @@ int main()
                 strcpy(reg.nome_cargo, carg.nome);
                 strcpy(reg.descricao, carg.descricao);
             }
-            //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criação!!!
+            //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criaï¿½ï¿½o!!!
             XXXXX
             //faz um searchtree na arvore de empresas e descobre a posicao da memoria
             XXXXX
@@ -313,7 +364,7 @@ int main()
                 fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                 strcpy(reg.nome_industria, ind.nome);
             }
-            //le no arquivo de critérios na posicao cargos.crit
+            //le no arquivo de critï¿½rios na posicao cargos.crit
             if (fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
             {
                 printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
@@ -326,7 +377,7 @@ int main()
                 strcpy(reg.qualificacao, crit.qualif);
                 strcpy(reg.yoe, crit.yoe);
             }
-            //le no arquivo de localizações na posicao cargos.id_est_loc
+            //le no arquivo de localizaï¿½ï¿½es na posicao cargos.id_est_loc
             if (fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
             {
                 printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
@@ -340,7 +391,7 @@ int main()
                 printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
             else
             {
-                printf("\n\nVocê gostaria de ver mais resultados?\n");
+                printf("\n\nVocï¿½ gostaria de ver mais resultados?\n");
                 printf("(1) Sim \t\t (2) Nao\n\n");
                 scanf("%d", &op_pag);
             }
@@ -392,4 +443,185 @@ int main()
         break;
     }
     return 0;
+}
+
+//--------------------------------------------------------------------
+// FUNCOES
+//--------------------------------------------------------------------
+
+// Funï¿½ï¿½o para criar um novo nï¿½
+Node* createNode() {
+    Node* newNode = (Node*)malloc(sizeof(Node));
+    if (newNode == NULL) {
+        perror("Erro ao alocar memï¿½ria para o novo nï¿½");
+        exit(EXIT_FAILURE);
+    }
+
+    newNode->num_keys = 0;
+    newNode->is_leaf = true;
+
+    for (int i = 0; i < 2 * ORDER; i++) {
+        newNode->children[i] = NULL;
+        //newNode->keys[i] = 0;
+        newNode->registros[i].key = 0;  // NAO SEI SE VAI FUNCIONAR!
+        newNode->registros[i].pos = 0;  // NAO SEI SE VAI FUNCIONAR!
+    }
+
+    return newNode;
+}
+
+// Funï¿½ï¿½o para dividir um nï¿½ filho do pai
+void splitChild(Node* parent, int index, Node* child) {
+    /* NODO FILHO A DIREITA CRIADO */
+    Node* newChild = createNode();
+    newChild->is_leaf = child->is_leaf;
+    newChild->num_keys = ORDER - 1;
+
+    // DIVIDE AS CHAVES ENTRE NODOS FILHOS
+    for (int i = 0; i < ORDER - 1; i++){
+        //newChild->keys[i] = child->keys[i + ORDER];
+        newChild->registros[i].key = child->registros[i + ORDER].key; //NAO SEI SE FUNCIONA
+        newChild->registros[i].pos = child->registros[i + ORDER].pos; //NAO SEI SE FUNCIONA
+    }
+
+    if (!child->is_leaf) {
+        for (int i = 0; i < ORDER; i++)
+            newChild->children[i] = child->children[i + ORDER];
+    }
+
+    child->num_keys = ORDER - 1;
+
+    for (int i = parent->num_keys; i >= index + 1; i--)
+        parent->children[i + 1] = parent->children[i];
+
+    parent->children[index + 1] = newChild;
+
+    // O QUE FAZ? NAO SEI, POREM VOU TENTAR SOMENTE SUBSTITUIR PELO NOVO TIPO
+    for (int i = parent->num_keys - 1; i >= index; i--){
+        //parent->keys[i + 1] = parent->keys[i];
+        parent->registros[i + 1].key = parent->registros[i].key; //NAO SEI SE FUNCIONA
+        parent->registros[i + 1].pos = parent->registros[i].pos; //NAO SEI SE FUNCIONA
+    }
+    // O MESMO ALI DE CIMA!
+    //parent->keys[index] = child->keys[ORDER - 1];
+    parent->registros[index].key = child->registros[ORDER - 1].key; //NAO SEI SE FUNCIONA
+    parent->registros[index].pos = child->registros[ORDER - 1].pos; //NAO SEI SE FUNCIONA
+    parent->num_keys++;
+}
+
+// Funï¿½ï¿½o para inserir uma chave em uma ï¿½rvore B
+/* AO INVES DE INT key COLOCAMOS KEYPOS registro */
+void insert(Node** root, KEYPOS reg) {
+    Node* temp = *root;
+
+    /* CASO RAIZ VAZIA */
+    if (temp == NULL) {
+
+        *root = createNode();
+        /* NAO ADICIONAMOS MAIS SOMENTE KEY, E SIM, KEY E POS*/
+        //(*root)->keys[0] = key;
+        (*root)->registros[0].key = reg.key; //NAO TENHO CERTEZA SE VA FUNCIONAR
+        (*root)->registros[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
+        (*root)->num_keys = 1;
+
+    } else {
+        /* CASO NODO ESTIVER CHEIO */
+        if (temp->num_keys == 2 * ORDER - 1) {
+
+            Node* newRoot = createNode();
+            newRoot->is_leaf = false;
+            newRoot->children[0] = *root;
+
+            /* FUNCAO QUE DIVIDE O NODO CHEIO */
+            splitChild(newRoot, 0, *root);
+            int i = 0;
+
+            /* O REGISTRO A SER INSERIDO NAO SERï¿½ INSERIDO NA NOVA RAIZ E SIM EM UM DOS FILHOS
+               POR ISSO A CHAMADA RECURSIVA ABAIXO*/
+
+            /* POR QUE I = 0 OU I = 1? POIS UMA NOVA RAIZ SEMPRE TEM 2 FILHOS */
+
+            /*if (newRoot->keys[0] < key)
+                i++;
+            */
+
+            if (newRoot->registros[0].key < reg.key) // NAO SEI SE FUNCIONA
+                i++;
+
+            // CHAMADA RECURSIVA
+            insert(&newRoot->children[i], reg); // SOMENTE TROQUEI key -> reg
+            *root = newRoot;
+
+        } else {
+
+            /* CASO O NODO NAO ESTIVER CHEIO */
+            // FAï¿½A ENQUANTO NAO EH FOLHA
+            while (!temp->is_leaf) {
+
+                int i = temp->num_keys - 1; // i, vira um ï¿½ndice do nodo que contem as chaves
+
+                // procurando posicao do filho da chave(registrador) i na qual verificar se ï¿½ folha para inserir.
+                while (i >= 0 && temp->registros[i].key > reg.key) // temp->keys[i] vira temp->registro[i].key, key vira reg.key
+                    i--;
+                i++;
+
+                if (temp->children[i]->num_keys == 2 * ORDER - 1) {
+                    splitChild(temp, i, temp->children[i]);
+                    if (temp->registros[i].key < reg.key)          // temp->keys[i] < key vira temp->registro[i].key < reg.key
+                        i++;
+                }
+                temp = temp->children[i];
+            }
+
+            // AQUI SABEMOS QUE O NODO ï¿½ FOLHA, ENTAO SOMENTE RESTA A INSERCAO.
+            int i = temp->num_keys - 1;
+            while (i >= 0 && temp->registros[i].key > reg.key) {                // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
+                temp->registros[i + 1].key = temp->registros[i].key;            // temp->keys[i + 1] = temp->keys[i] vira temp->registro[i + 1].key = temp->registro[i].key;
+                // ACREDITO SER NECESSARIO DESLOCAR A POSICAO TAMBEM.
+                // ISSO ABAIXO ï¿½ UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+                temp->registros[i + 1].pos = temp->registros[i].pos;
+                i--;
+            }
+            //temp->keys[i + 1] = key;
+            temp->registros[i + 1].key = reg.key;
+            // ISSO ABAIXO ï¿½ UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+            temp->registros[i + 1].pos = reg.pos;
+            temp->num_keys++;
+        }
+    }
+}
+
+// Funï¿½ï¿½o para percorrer a ï¿½rvore B
+void traverse(Node* root) {
+    if (root != NULL) {
+        int i;
+        for (i = 0; i < root->num_keys; i++) {
+            traverse(root->children[i]);
+            //printf("%d ", root->keys[i]);
+            printf("ch:%d, pos:%d\n", root->registros[i].key, root->registros[i].pos ); //TESTANDO
+        }
+        traverse(root->children[i]);
+    }
+}
+
+// Funcao para buscar um registro na B-Tree
+KEYPOS* search(Node* root, int key) {
+    // Encontra a primeira chave maior ou igual a chave entrada
+    int i = 0;
+    while (i < root->num_keys && key > root->registros[i].key) {
+        i++;
+    }
+
+    // Se a chave for encontrada neste nodo, retorna o registro
+    if (i < root->num_keys && key == root->registros[i].key) {
+        return &root->registros[i];
+    }
+
+    // Se a chave nao for encontrada e este for um nodo folha, retorna NULL
+    if (root->is_leaf) {
+        return NULL;
+    }
+
+    // Vai para o filho apropriado
+    return search(root->children[i], key);
 }
