@@ -222,6 +222,7 @@ int main()
             if (resultado.pos == NULL)  // se a busca retornou NULL
             {
                 printf("Empresa nao encontrada\n");
+                break;
             }
             else
             {
