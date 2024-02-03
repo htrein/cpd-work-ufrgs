@@ -2,15 +2,14 @@
 // BIBLIOTECAS
 //--------------------------------------------------------------------
 
-#include "app_jobs.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
-
+#include <string.h>
 //--------------------------------------------------------------------
 // CONSTANTES
 //--------------------------------------------------------------------
-
+#define MAX_NOME_LENGTH 10000
 #define ORDER 2
 
 //--------------------------------------------------------------------
@@ -24,7 +23,7 @@ typedef struct
     int id_cargo;
     long id_est_loc;
     long id_est_crit;
-} CARGO;
+}CARGO;
 
 typedef struct
 {
@@ -78,18 +77,21 @@ typedef struct
 } REGISTRO;
 
 // chave-posicao, armazena chave e posicao do registro que queremos
-typedef struct keyPos{
+typedef struct keyPos
+{
     int key;
-    int pos;
-}KEYPOS;
+    long pos;
+    int encontrado;
+} KEYPOS;
 
-// Definindo a estrutura de um nï¿½ da ï¿½rvore B
-typedef struct node {
+// Definindo a estrutura de um nodo da arvore B
+typedef struct node
+{
     //int keys[2 * ORDER - 1];
     KEYPOS registros[2 * ORDER - 1];    // registros com chaves-posicoes dos arquivos
     struct node *children[2 * ORDER];
     int num_keys;
-    bool is_leaf;                       // ï¿½ folha
+    bool is_leaf;
 } Node;
 
 //--------------------------------------------------------------------
@@ -150,6 +152,7 @@ int main()
     //posicoes de memoria
     long pos_emp;
     long pos_carg;
+    long pos_oft;
 
     //estruturas
     INDUSTRIA ind;
@@ -159,7 +162,15 @@ int main()
     LOCALIZACAO loc;
     CRITERIOS crit;
     REGISTRO reg;
+    KEYPOS resultado;
 
+
+    //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
+
+
+
+
+    //MENU DE OPCOES
     do
     {
         system("cls");
@@ -172,23 +183,19 @@ int main()
     }
     while(option!=0&&option!=1&&option!=2&&option!=3);
 
+
     switch(option)
     {
-
     case 0:
+
+        //AQUI SE SOBRAR TEMPO, ADICIONAMOS A FUNCAO DE ATUALIZAR
+
         printf("atualizando arquivo fonte...\n");
-        FILE *arquivo_p = fopen("dataset.csv", "r");
-        if (arquivo_p == NULL)
-        {
-            printf("Erro ao abrir o arquivo");
-            return 1;
-        }
-
-        // ...
-
-        fclose("dataset.csv");
 
     case 1:
+
+        //AQUI EH A BUSCA RAPIDA
+
         do
         {
             system("cls");
@@ -207,22 +214,18 @@ int main()
             paginada = 0;
             printf("Digite o nome da empresa:\n");
             scanf("%s", key_busca);
-            FILE* arqemp = fopen("dataset.csv", "rb");
-            FILE* arqind = fopen("dataset.csv", "rb");
-            FILE* arqof = fopen("dataset.csv", "rb");
-            FILE* arqcarg = fopen("dataset.csv", "rb");
-            FILE* arqloc = fopen("dataset.csv", "rb");
-            FILE* arqcrit = fopen("dataset.csv", "rb"); //TEM QUE COLOCAR OS NOMES DOS ARQUIVOS CORRETAMENTE
+            FILE* arqemp = fopen("empresas2.bin", "rb");
+            FILE* arqind = fopen("industria2.bin", "rb");
+            FILE* arqof = fopen("ofertas.bin", "rb");
+            FILE* arqcarg = fopen("cargos2.bin", "rb");
+            FILE* arqloc = fopen("localizacao2.bin", "rb");
+            FILE* arqcrit = fopen("", "rb");
 
             //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
-            KEYPOS resultado; 
-
-            resultado.pos = search(arqemp, key_busca); // nao sei se isso funciona
-
-            if (resultado.pos == NULL)  // se a busca retornou NULL
+            resultado = search(emptree, key_busca); // nao sei se isso funciona
+            if (resultado == NULL)  // se a busca retornou NULL
             {
                 printf("Empresa nao encontrada\n");
-                break;
             }
             else
             {
@@ -240,6 +243,7 @@ int main()
                 strcpy(reg.nome_empresa, emp.nome);
                 strcpy(reg.website, emp.website);
             }
+
             //le arquivo de industrias na posicao empresa.id_est_ind e printa os campos
             if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
             {
@@ -250,60 +254,85 @@ int main()
                 fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                 strcpy(reg.nome_industria, ind.nome);
             }
-            XXXXXXXXXXXXXXXX
-            //faz um "SearchTree" para a tree de cargos e procura pelo cargo.id e retorna a posicao de memoria do cargo
-            XXXXXXXXXXXXXXXX
-            //le no arquivo de cargos na posicao de memoria previamente encontrada e printa os campos
-            if(fseek(arqcarg, pos_carg, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de cargos\n");
-            }
-            else
-            {
-                fread(&carg, sizeof(CARGO), 1, arqcarg);
-                strcpy(reg.nome_cargo, carg.nome);
-                strcpy(reg.descricao, carg.descricao);
-            }
-            //le o arquivo de localizaï¿½ï¿½o na posicao cargos.id_est_loc e printa os campos
-            if(fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
-            }
-            else
-            {
-                fread(&loc, sizeof(LOCALIZACAO), 1, arqloc);
-                strcpy(reg.nome_localizacao, loc.nome);
-            }
-            //le o arquivo de critï¿½rios da posicao cargos.id_est_crit e printa os campos
-            if(fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
-            }
-            else
-            {
-                fread(&crit, sizeof(CRITERIOS), 1, arqcrit);
-                strcpy(reg.habilidades, crit.habilidades);
-                strcpy(reg.qualificacao, crit.qualif);
-                strcpy(reg.especializacao, crit.especializacao);
-                strcpy(reg.yoe, crit.yoe);
-            }
-            if(paginada < 8)
-                printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
-            else
-            {
-                printf("\n\nVocï¿½ gostaria de ver mais resultados?\n");
-                printf("(1) Sim \t\t (2) Nao\n\n");
-                scanf("%d", &op_pag);
-            }
-            if(op_pag == 1)
-            {
-                system("cls");
-                paginada = 0;
-            }
 
-            //while(op_pag!=2 || Xxxxx);
+            //faz searchtree na arvore de ofertas procurando pelo posicao de memoria da empresa e retorna a posicao de memoria do cargo correspondente, também guarda a data de criação
+            //VER O TIPO DE LOOP AQUI (deve ser algo do tipo: enquanto existirem nodos com essa chave com "encontrado" = 0, faça)
+            do
+            {
+                resultado = search(ofttree, pos_emp); // nao sei se isso funciona
+                if (resultado == NULL)  // se a busca retornou NULL
+                {
+                    printf("Empresa nao encontrada\n");
+                }
+                else
+                {
+                    pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                }
+                if(fseek(arqof, pos_oft, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de ofertas\n");
+                }
+                else
+                {
+                    fread(&oft, sizeof(OFERTA), 1, arqof);
+                    strcpy(reg.data_criacao, oft.data_criacao);
+                    pos_carg = oft.id_est_cargo;
+                }
 
-            //aqui ï¿½ o final do do - while e ï¿½ onde ï¿½ preciso printar, para que a struct possa ser sobrescrita com o que ï¿½ relacionado a cargo
+                //le no arquivo de cargos na posicao de memoria previamente encontrada e printa os campos
+                if(fseek(arqcarg, pos_carg, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de cargos\n");
+                }
+                else
+                {
+                    fread(&carg, sizeof(CARGO), 1, arqcarg);
+                    strcpy(reg.nome_cargo, carg.nome);
+                    strcpy(reg.descricao, carg.descricao);
+                }
+
+                //le o arquivo de localizacao na posicao cargos.id_est_loc e printa os campos
+                if(fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
+                }
+                else
+                {
+                    fread(&loc, sizeof(LOCALIZACAO), 1, arqloc);
+                    strcpy(reg.nome_localizacao, loc.nome);
+                }
+
+                //le o arquivo de criterios da posicao cargos.id_est_crit e printa os campos
+                if(fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
+                }
+                else
+                {
+                    fread(&crit, sizeof(CRITERIOS), 1, arqcrit);
+                    strcpy(reg.habilidades, crit.habilidades);
+                    strcpy(reg.qualificacao, crit.qualif);
+                    strcpy(reg.especializacao, crit.especializacao);
+                    strcpy(reg.yoe, crit.yoe);
+                }
+                paginada++;
+
+                //paginacao de resultados
+                if(paginada < 8)
+                    printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
+                else
+                {
+                    printf("\n\nVoce gostaria de ver mais resultados?\n");
+                    printf("(1) Sim \t\t (2) Nao\n\n");
+                    scanf("%d", &op_pag);
+                }
+                if(op_pag == 1)
+                {
+                    system("cls");
+                    paginada = 0;
+                }
+            }while();
+
             fclose(arqemp);
             fclose(arqind);
             fclose(arqof);
@@ -314,19 +343,28 @@ int main()
         }
         else
         {
+
             paginada = 0;
             printf("Digite o nome do cargo:\n");
             scanf("%s", key_busca);
-
-            FILE* arqemp = fopen("dataset.csv", "rb");
-            FILE* arqind = fopen("dataset.csv", "rb");
-            FILE* arqof = fopen("dataset.csv", "rb");
-            FILE* arqcarg = fopen("dataset.csv", "rb");
-            FILE* arqloc = fopen("dataset.csv", "rb");
-            FILE* arqcrit = fopen("dataset.csv", "rb"); //CORRIGIR O NOME DOS ARQUIVOS
+            FILE* arqemp = fopen("empresas2.bin", "rb");
+            FILE* arqind = fopen("industria2.bin", "rb");
+            FILE* arqof = fopen("ofertas.bin", "rb");
+            FILE* arqcarg = fopen("cargos2.bin", "rb");
+            FILE* arqloc = fopen("localizacao2.bin", "rb");
+            FILE* arqcrit = fopen("", "rb");
 
             //faz um SearchTree na arvore de cargos e descobre a posicao de memoria
-            XXXXX
+            resultado = search(cargtree, key_busca);
+            if (resultado == NULL)
+            {
+                printf("Empresa nao encontrada\n");
+            }
+            else
+            {
+                pos_carg = resultado.pos;
+            }
+
             //le no arquivo de cargo nessa posicao e printa as informacoes
             if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
             {
@@ -338,79 +376,107 @@ int main()
                 strcpy(reg.nome_cargo, carg.nome);
                 strcpy(reg.descricao, carg.descricao);
             }
-            //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criaï¿½ï¿½o!!!
-            XXXXX
-            //faz um searchtree na arvore de empresas e descobre a posicao da memoria
-            XXXXX
-            //le no arquivo de empresas e printa as informacoes
-            if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas\n");
-            }
-            else
-            {
-                fread(&emp, sizeof(EMPRESA), 1, arqemp);
-                strcpy(reg.nome_empresa, emp.nome);
-                strcpy(reg.website, emp.website);
-            }
-            //le no arquivo de industrias na posicao empresas.id_est_ind
-            if (fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias\n");
-            }
-            else
-            {
-                fread(&ind, sizeof(INDUSTRIA), 1, arqind);
-                strcpy(reg.nome_industria, ind.nome);
-            }
-            //le no arquivo de critï¿½rios na posicao cargos.crit
-            if (fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
-            }
-            else
-            {
-                fread(&crit, sizeof(CRITERIOS), 1, arqcrit);
-                strcpy(reg.habilidades, crit.habilidades);
-                strcpy(reg.especializacao, crit.especializacao);
-                strcpy(reg.qualificacao, crit.qualif);
-                strcpy(reg.yoe, crit.yoe);
-            }
-            //le no arquivo de localizaï¿½ï¿½es na posicao cargos.id_est_loc
-            if (fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
-            }
-            else
-            {
-                fread(&loc, sizeof(LOCALIZACAO), 1, arqloc);
-                strcpy(reg.nome_localizacao, loc.nome);
-            }
-            if(paginada < 8)
-                printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
-            else
-            {
-                printf("\n\nVocï¿½ gostaria de ver mais resultados?\n");
-                printf("(1) Sim \t\t (2) Nao\n\n");
-                scanf("%d", &op_pag);
-            }
-            if(op_pag == 1)
-            {
-                system("cls");
-                paginada = 0;
-            }
-        }
-        while(op_pag!=2 || Xxxxx);
-        fclose(arqemp);
-        fclose(arqind);
-        fclose(arqof);
-        fclose(arqcarg);
-        fclose(arqloc);
-        fclose(arqcrit);
 
-        break;
+            //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
+            do //definir esse laço que nem o do caso anterior
+            {
+                resultado = search(ofttree, pos_carg); // nao sei se isso funciona
+                if (resultado == NULL)  // se a busca retornou NULL
+                {
+                    printf("Empresa nao encontrada\n");
+                }
+                else
+                {
+                    pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                }
+                if (fseek(arqof, pos_oft, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de ofertas\n");
+                }
+                else
+                {
+                    fread(&oft, sizeof(OFERTA), 1, arqof);
+                    strcpy(reg.data_criacao, oft.data_criacao);
+                    pos_emp = oft.id_est_emp;
+                }
+
+                //le no arquivo de empresas e printa as informacoes
+                if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas\n");
+                }
+                else
+                {
+                    fread(&emp, sizeof(EMPRESA), 1, arqemp);
+                    strcpy(reg.nome_empresa, emp.nome);
+                    strcpy(reg.website, emp.website);
+                }
+
+                //le no arquivo de industrias na posicao empresas.id_est_ind
+                if (fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias\n");
+                }
+                else
+                {
+                    fread(&ind, sizeof(INDUSTRIA), 1, arqind);
+                    strcpy(reg.nome_industria, ind.nome);
+                }
+
+                //le no arquivo de criterios na posicao cargos.crit
+                if (fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
+                }
+                else
+                {
+                    fread(&crit, sizeof(CRITERIOS), 1, arqcrit);
+                    strcpy(reg.habilidades, crit.habilidades);
+                    strcpy(reg.especializacao, crit.especializacao);
+                    strcpy(reg.qualificacao, crit.qualif);
+                    strcpy(reg.yoe, crit.yoe);
+                }
+
+                //le no arquivo de localizacoes na posicao cargos.id_est_loc
+                if (fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
+                }
+                else
+                {
+                    fread(&loc, sizeof(LOCALIZACAO), 1, arqloc);
+                    strcpy(reg.nome_localizacao, loc.nome);
+                }
+                paginada++;
+
+                if(paginada < 8)
+                    printf("Empresa: %s\nWebsite: %s\nIndustria: %s\nCargo: %s\nData de oferta: %s\nDescricao: %s\nLocalizacao: %s\n--Requisitos--\nHabilidades: %s\nEspecializacao: %s\nQualificacao: %s\nAnos de experiencia: %s\n\n\n", reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
+                else
+                {
+                    printf("\n\nVoce gostaria de ver mais resultados?\n");
+                    printf("(1) Sim \t\t (2) Nao\n\n");
+                    scanf("%d", &op_pag);
+                }
+                if(op_pag == 1)
+                {
+                    system("cls");
+                    paginada = 0;
+                }
+            }
+            while();
+
+            fclose(arqemp);
+            fclose(arqind);
+            fclose(arqof);
+            fclose(arqcarg);
+            fclose(arqloc);
+            fclose(arqcrit);
+            break;
+        }
 
     case 2:
+
+        //AQUI SERIA A PARTE DE CLASSIFICACAO
 
         do
         {
@@ -435,11 +501,17 @@ int main()
         }
         break;
 
+
+
     case 3:
 
+    //AQUI SERIA A PARTE DA ANALISE ESTATISTICA
+
+
     default:
-        printf("default");
         break;
+
+
     }
     return 0;
 }
@@ -448,10 +520,12 @@ int main()
 // FUNCOES
 //--------------------------------------------------------------------
 
-// Funï¿½ï¿½o para criar um novo nï¿½
-Node* createNode() {
+// Funcao para criar um novo nodo
+Node* createNode()
+{
     Node* newNode = (Node*)malloc(sizeof(Node));
-    if (newNode == NULL) {
+    if (newNode == NULL)
+    {
         perror("Erro ao alocar memï¿½ria para o novo nï¿½");
         exit(EXIT_FAILURE);
     }
@@ -459,7 +533,8 @@ Node* createNode() {
     newNode->num_keys = 0;
     newNode->is_leaf = true;
 
-    for (int i = 0; i < 2 * ORDER; i++) {
+    for (int i = 0; i < 2 * ORDER; i++)
+    {
         newNode->children[i] = NULL;
         //newNode->keys[i] = 0;
         newNode->registros[i].key = 0;  // NAO SEI SE VAI FUNCIONAR!
@@ -469,21 +544,24 @@ Node* createNode() {
     return newNode;
 }
 
-// Funï¿½ï¿½o para dividir um nï¿½ filho do pai
-void splitChild(Node* parent, int index, Node* child) {
+// Funcao para dividir um nodo filho do pai
+void splitChild(Node* parent, int index, Node* child)
+{
     /* NODO FILHO A DIREITA CRIADO */
     Node* newChild = createNode();
     newChild->is_leaf = child->is_leaf;
     newChild->num_keys = ORDER - 1;
 
     // DIVIDE AS CHAVES ENTRE NODOS FILHOS
-    for (int i = 0; i < ORDER - 1; i++){
+    for (int i = 0; i < ORDER - 1; i++)
+    {
         //newChild->keys[i] = child->keys[i + ORDER];
         newChild->registros[i].key = child->registros[i + ORDER].key; //NAO SEI SE FUNCIONA
         newChild->registros[i].pos = child->registros[i + ORDER].pos; //NAO SEI SE FUNCIONA
     }
 
-    if (!child->is_leaf) {
+    if (!child->is_leaf)
+    {
         for (int i = 0; i < ORDER; i++)
             newChild->children[i] = child->children[i + ORDER];
     }
@@ -496,7 +574,8 @@ void splitChild(Node* parent, int index, Node* child) {
     parent->children[index + 1] = newChild;
 
     // O QUE FAZ? NAO SEI, POREM VOU TENTAR SOMENTE SUBSTITUIR PELO NOVO TIPO
-    for (int i = parent->num_keys - 1; i >= index; i--){
+    for (int i = parent->num_keys - 1; i >= index; i--)
+    {
         //parent->keys[i + 1] = parent->keys[i];
         parent->registros[i + 1].key = parent->registros[i].key; //NAO SEI SE FUNCIONA
         parent->registros[i + 1].pos = parent->registros[i].pos; //NAO SEI SE FUNCIONA
@@ -508,13 +587,15 @@ void splitChild(Node* parent, int index, Node* child) {
     parent->num_keys++;
 }
 
-// Funï¿½ï¿½o para inserir uma chave em uma ï¿½rvore B
+// Funcao para inserir uma chave em uma arvore B
 /* AO INVES DE INT key COLOCAMOS KEYPOS registro */
-void insert(Node** root, KEYPOS reg) {
+void insert(Node** root, KEYPOS reg)
+{
     Node* temp = *root;
 
     /* CASO RAIZ VAZIA */
-    if (temp == NULL) {
+    if (temp == NULL)
+    {
 
         *root = createNode();
         /* NAO ADICIONAMOS MAIS SOMENTE KEY, E SIM, KEY E POS*/
@@ -523,9 +604,12 @@ void insert(Node** root, KEYPOS reg) {
         (*root)->registros[0].pos = reg.pos; //NAO TENHO CERTEZA SE VA FUNCIONAR
         (*root)->num_keys = 1;
 
-    } else {
+    }
+    else
+    {
         /* CASO NODO ESTIVER CHEIO */
-        if (temp->num_keys == 2 * ORDER - 1) {
+        if (temp->num_keys == 2 * ORDER - 1)
+        {
 
             Node* newRoot = createNode();
             newRoot->is_leaf = false;
@@ -535,7 +619,7 @@ void insert(Node** root, KEYPOS reg) {
             splitChild(newRoot, 0, *root);
             int i = 0;
 
-            /* O REGISTRO A SER INSERIDO NAO SERï¿½ INSERIDO NA NOVA RAIZ E SIM EM UM DOS FILHOS
+            /* O REGISTRO A SER INSERIDO NAO SERA INSERIDO NA NOVA RAIZ E SIM EM UM DOS FILHOS
                POR ISSO A CHAMADA RECURSIVA ABAIXO*/
 
             /* POR QUE I = 0 OU I = 1? POIS UMA NOVA RAIZ SEMPRE TEM 2 FILHOS */
@@ -551,20 +635,24 @@ void insert(Node** root, KEYPOS reg) {
             insert(&newRoot->children[i], reg); // SOMENTE TROQUEI key -> reg
             *root = newRoot;
 
-        } else {
+        }
+        else
+        {
 
             /* CASO O NODO NAO ESTIVER CHEIO */
-            // FAï¿½A ENQUANTO NAO EH FOLHA
-            while (!temp->is_leaf) {
+            // FACA ENQUANTO NAO EH FOLHA
+            while (!temp->is_leaf)
+            {
 
-                int i = temp->num_keys - 1; // i, vira um ï¿½ndice do nodo que contem as chaves
+                int i = temp->num_keys - 1; // i, vira um indice do nodo que contem as chaves
 
-                // procurando posicao do filho da chave(registrador) i na qual verificar se ï¿½ folha para inserir.
+                // procurando posicao do filho da chave(registrador) i na qual verificar se eh folha para inserir.
                 while (i >= 0 && temp->registros[i].key > reg.key) // temp->keys[i] vira temp->registro[i].key, key vira reg.key
                     i--;
                 i++;
 
-                if (temp->children[i]->num_keys == 2 * ORDER - 1) {
+                if (temp->children[i]->num_keys == 2 * ORDER - 1)
+                {
                     splitChild(temp, i, temp->children[i]);
                     if (temp->registros[i].key < reg.key)          // temp->keys[i] < key vira temp->registro[i].key < reg.key
                         i++;
@@ -572,29 +660,33 @@ void insert(Node** root, KEYPOS reg) {
                 temp = temp->children[i];
             }
 
-            // AQUI SABEMOS QUE O NODO ï¿½ FOLHA, ENTAO SOMENTE RESTA A INSERCAO.
+            // AQUI SABEMOS QUE O NODO EH FOLHA, ENTAO SOMENTE RESTA A INSERCAO.
             int i = temp->num_keys - 1;
-            while (i >= 0 && temp->registros[i].key > reg.key) {                // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
+            while (i >= 0 && temp->registros[i].key > reg.key)                  // temp->keys[i] > key VIRA temp->registro[i].key > reg.key
+            {
                 temp->registros[i + 1].key = temp->registros[i].key;            // temp->keys[i + 1] = temp->keys[i] vira temp->registro[i + 1].key = temp->registro[i].key;
                 // ACREDITO SER NECESSARIO DESLOCAR A POSICAO TAMBEM.
-                // ISSO ABAIXO ï¿½ UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+                // ISSO ABAIXO EH UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
                 temp->registros[i + 1].pos = temp->registros[i].pos;
                 i--;
             }
             //temp->keys[i + 1] = key;
             temp->registros[i + 1].key = reg.key;
-            // ISSO ABAIXO ï¿½ UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
+            // ISSO ABAIXO EH UM PALPITE, POIS NAO ENTENDI ESSA PARTE DO CODIGO
             temp->registros[i + 1].pos = reg.pos;
             temp->num_keys++;
         }
     }
 }
 
-// Funï¿½ï¿½o para percorrer a ï¿½rvore B
-void traverse(Node* root) {
-    if (root != NULL) {
+// Funcao para percorrer a arvore B
+void traverse(Node* root)
+{
+    if (root != NULL)
+    {
         int i;
-        for (i = 0; i < root->num_keys; i++) {
+        for (i = 0; i < root->num_keys; i++)
+        {
             traverse(root->children[i]);
             //printf("%d ", root->keys[i]);
             printf("ch:%d, pos:%d\n", root->registros[i].key, root->registros[i].pos ); //TESTANDO
@@ -604,20 +696,24 @@ void traverse(Node* root) {
 }
 
 // Funcao para buscar um registro na B-Tree
-KEYPOS* search(Node* root, int key) {
+KEYPOS* search(Node* root, int key)
+{
     // Encontra a primeira chave maior ou igual a chave entrada
     int i = 0;
-    while (i < root->num_keys && key > root->registros[i].key) {
+    while (i < root->num_keys && key > root->registros[i].key)
+    {
         i++;
     }
 
     // Se a chave for encontrada neste nodo, retorna o registro
-    if (i < root->num_keys && key == root->registros[i].key) {
+    if (i < root->num_keys && key == root->registros[i].key)
+    {
         return &root->registros[i];
     }
 
     // Se a chave nao for encontrada e este for um nodo folha, retorna NULL
-    if (root->is_leaf) {
+    if (root->is_leaf)
+    {
         return NULL;
     }
 
