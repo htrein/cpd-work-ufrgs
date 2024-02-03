@@ -76,12 +76,12 @@ typedef struct
     char data_criacao[100];
 } REGISTRO;
 
-// chave-posicao, armazena chave e posicao do registro que queremos
+// chave-posicao, armazena chave e posicao(indice) do registro que queremos
 typedef struct keyPos
 {
     int key;
     long pos;
-    int encontrado;
+    int encontrado; // pra que?
 } KEYPOS;
 
 // Definindo a estrutura de um nodo da arvore B
@@ -104,6 +104,7 @@ void splitChild(Node* parent, int index, Node* child);
 void insert(Node** root, KEYPOS reg);
 void traverse(Node* root);
 KEYPOS* search(Node* root, int key);
+int str_to_inteiro(char str[]);
 
 //--------------------------------------------------------------------
 // MAIN FUNCTION
@@ -162,12 +163,63 @@ int main()
     LOCALIZACAO loc;
     CRITERIOS crit;
     REGISTRO reg;
-    KEYPOS resultado;
+    //KEYPOS resultado;
+
+    // MONTAR ARVORE NO INICIO DO PROGRAMA.
+    Node* root_emp = NULL;
+    Node* root_cargos = NULL;
+    KEYPOS ch;
+    FILE* arqemp2;
+    FILE* arqcargos2;
+
+
+    // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
+    arqem2 = fopen("empresas2.bin", "rb");
+
+    // Verificando se o arquivo foi aberto corretamente
+    if (arqemp2 == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    // Lendo os dados do arquivo binário e exibindo-os
+    while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1) {
+        ch.key = str_to_inteiro(emp.nome);
+        ch.pos = emp.id_emp // id seria posicao(indice) da empresao no arquivo empresa?sim
+        ch.encontrado = 0;
+        insert(&root_emp, ch);
+    }
+
+    // Fechando o arquivo
+    fclose(arqemp2);
+
+    /* A VARIAVEL root_emp É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE EMPRESAS */
+
+    // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de cargos.
+    arqcargos2 = fopen("cargos2.bin", "rb");
+
+    // Verificando se o arquivo foi aberto corretamente
+    if (arqcargos2 == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    // Lendo os dados do arquivo binário e exibindo-os
+    while (fread(&carg, sizeof(CARGO), 1, arqcargos2) == 1) {
+        ch.key = str_to_inteiro(carg.nome);
+        ch.pos = carg.id_cargo // id seria posicao(indice) da cargo no arquivo empresa?sim
+        ch.encontrado = 0;
+        insert(&root_cargos, ch);
+    }
+
+    // Fechando o arquivo
+    fclose(arqcargos2);
+
+    /* A VARIAVEL root_cargos É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE CARGOS */
 
 
     //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
-
-
+    // ESTAO LOGO ACIMA
 
 
     //MENU DE OPCOES
@@ -355,6 +407,7 @@ int main()
             FILE* arqcrit = fopen("", "rb");
 
             //faz um SearchTree na arvore de cargos e descobre a posicao de memoria
+            // alc. Para isso a arvore deve estar feita.
             resultado = search(cargtree, key_busca);
             if (resultado == NULL)
             {
@@ -720,3 +773,21 @@ KEYPOS* search(Node* root, int key)
     // Vai para o filho apropriado
     return search(root->children[i], key);
 }
+
+// ESSA FUNCAO GERARÁ CHAVES A PARTIR DE STRINGS
+// ESSAS CHAVES SERAO USADAS NA ARVORE E TAMBEM NO MOMENTO APOS O USUARIO
+// DAR SUA ENTRADA.
+
+int str_to_inteiro(char str[]){
+    int soma_ascii = 0;
+
+    // Convertendo a string para inteiros com base nos valores ASCII dos caracteres
+    for (int i = 0; str[i] != '\0'; i++) {
+        valores[i] = (int)str[i]; // Convertendo o caractere para seu valor ASCII
+        soma_ascii = soma_ascii valores[i];
+    }
+
+    return soma_ascii
+}
+
+
