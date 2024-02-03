@@ -198,7 +198,7 @@ int main()
                 fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                 strcpy(reg.nome_industria, ind.nome);
             }
-            //faz um "SearchTree" para a tree de ofertas e procura pelo empresa.id e retorna o cargo.id, é preciso tambem retornar a data de criacao!!! //REPETIR ESSE PROCESSO ATÉ QUE TODOS OS CARGOS TENHAM SIDO LIDOS
+            //faz um "SearchTree" para a tree de ofertas e procura pelo empresa.id e retorna o cargo.id, é preciso tambem retornar a data de criacao (basta guardar a posição de memória do aquivo de ofertas em que foi encontrada o empresa.id)!!! //REPETIR ESSE PROCESSO ATÉ QUE TODOS OS CARGOS TENHAM SIDO LIDOS
             //a partir daqui tudo é dentro de um do{} while todos nodos com o empresa.id tenham sido encontrados e tratados
             XXXXXXXXXXXXXXXX
             //faz um "SearchTree" para a tree de cargos e procura pelo cargo.id e retorna a posicao de memoria do cargo
