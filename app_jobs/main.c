@@ -168,9 +168,14 @@ int main()
     // MONTAR ARVORE NO INICIO DO PROGRAMA.
     Node* root_emp = NULL;
     Node* root_cargos = NULL;
-    KEYPOS ch;
+    Node* root_ofertas_emp = NULL;
+    Node* root_ofertas_cargos = NULL;
     FILE* arqemp2;
     FILE* arqcargos2;
+    FILE* arq_ofertas_emp;
+    FILE* arq_ofertas_cargos;
+    KEYPOS ch;
+
 
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
@@ -217,6 +222,53 @@ int main()
 
     /* A VARIAVEL root_cargos É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE CARGOS */
 
+    // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de ofertas emp.
+    arq_ofertas_emp = fopen("ofertas.bin", "rb");
+
+    // Verificando se o arquivo foi aberto corretamente
+    if (arq_ofertas_emp == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    // Lendo os dados do arquivo binário e exibindo-os
+    i = 0;
+    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_emp) == 1) {
+        ch.key = oft.id_est_emp;
+        ch.pos = i;             // posicao, indice no arquivo ofertas.bin
+        ch.encontrado = 0;
+        insert(&root_ofertas_emp, ch);
+        i++;
+    }
+
+    // Fechando o arquivo
+    fclose(arq_ofertas_emp);
+
+    /* A VARIAVEL root_ofertas_emp É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE ofertas-empresas */
+
+    // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de ofertas emp.
+    arq_ofertas_cargos = fopen("ofertas.bin", "rb");
+
+    // Verificando se o arquivo foi aberto corretamente
+    if (arq_ofertas_cargos == NULL) {
+        printf("Erro ao abrir o arquivo.\n");
+        return 1;
+    }
+
+    // Lendo os dados do arquivo binário e exibindo-os
+    i = 0;
+    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_cargos) == 1) {
+        ch.key = oft.id_est_cargo;
+        ch.pos = i;             // posicao, indice no arquivo ofertas.bin
+        ch.encontrado = 0;
+        insert(&root_ofertas_cargos, ch);
+        i++;
+    }
+
+    // Fechando o arquivo
+    fclose(arq_ofertas_cargos);
+
+    /* A VARIAVEL root_ofertas_cargos É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE ofertas-cargos */
 
     //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
     // ESTAO LOGO ACIMA
