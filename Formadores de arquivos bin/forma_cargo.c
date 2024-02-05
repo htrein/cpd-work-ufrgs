@@ -10,6 +10,7 @@ typedef struct
     char descricao[MAX_NOME_LENGTH];
     int id_cargo;
     long id_est_loc;
+    long id_est_crit;
 } CARGO;
 
 typedef struct
@@ -254,7 +255,8 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
         cargos.id_cargo = k;
         //acha a chave estrangeira
-        FILE *arquivo = fopen("localizacao2.bin", "rb");
+        FILE *arquivo = fopen("localizacoes.bin", "rb");
+        FILE *arq = fopen("criterios.bin", "rb");
         int encontrado = 0;
         if (arquivo == NULL)
         {
@@ -275,6 +277,26 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
             else
                 cargos.id_est_loc = -1;
 
+        if (arq == NULL)
+        {
+            printf("Erro ao abrir o arquivo 'criterios.bin'\n");
+            return 1; // Ou outra ação apropriada em caso de erro
+        }
+        rewind(arq);
+        while (!feof(arq) && encontrado == 0)
+            if (fread(&crit, sizeof(CRITERIOS), 1, arq) == 1)
+            {
+                if (strcmp(, chave2)==0)
+                {
+                    encontrado = 1;
+                    fseek(arq, -sizeof(CRITERIOS), SEEK_CUR);
+                    cargos.id_est_crit = ftell(arq);
+                }
+            }
+            else
+                cargos.id_est_crit = -1;
+
+        fclose(arq);
         fclose(arquivo);
         // Escreve no arquivo binário
         fwrite(&cargos, sizeof(CARGO), 1, arquivoBinario);
