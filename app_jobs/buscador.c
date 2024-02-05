@@ -193,7 +193,7 @@ int main()
     KEYPOS ch;
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
-    arqem2 = fopen("empresas2.bin", "rb");
+    arqemp2 = fopen("empresas2.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
     if (arqemp2 == NULL) {
@@ -204,7 +204,7 @@ int main()
     // Lendo os dados do arquivo binário e exibindo-os
     while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1) {
         ch.key = str_to_inteiro(emp.nome);
-        ch.pos = emp.id_emp // id seria posicao(indice) da empresao no arquivo empresa?sim
+        ch.pos = emp.id_emp; // id seria posicao(indice) da empresao no arquivo empresa?sim
         ch.encontrado = 0;
         insert(&root_emp, ch);
     }
@@ -226,7 +226,7 @@ int main()
     // Lendo os dados do arquivo binário e exibindo-os
     while (fread(&carg, sizeof(CARGO), 1, arqcargos2) == 1) {
         ch.key = str_to_inteiro(carg.nome);
-        ch.pos = carg.id_cargo // id seria posicao(indice) da cargo no arquivo empresa?sim
+        ch.pos = carg.id_cargo; // id seria posicao(indice) da cargo no arquivo empresa?sim
         ch.encontrado = 0;
         insert(&root_cargos, ch);
     }
@@ -246,7 +246,7 @@ int main()
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
-    i = 0;
+    int i = 0;
     while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_emp) == 1) {
         ch.key = oft.id_est_emp;
         ch.pos = i;             // posicao, indice no arquivo ofertas.bin
@@ -331,12 +331,12 @@ int main()
             paginada = 0;
             printf("Digite o nome da empresa:\n");
             scanf("%s", key_busca);
-            FILE* arqemp = fopen("empresas2.bin", "rb");
-            FILE* arqind = fopen("industria2.bin", "rb");
+            FILE* arqemp = fopen("empresas.bin", "rb");
+            FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
-            FILE* arqcarg = fopen("cargos2.bin", "rb");
-            FILE* arqloc = fopen("localizacao2.bin", "rb");
-            FILE* arqcrit = fopen("", "rb");
+            FILE* arqcarg = fopen("cargos.bin", "rb");
+            FILE* arqloc = fopen("localizacoes.bin", "rb");
+            FILE* arqcrit = fopen("criterios.bin", "rb");
 
             /* A FUNCAO SEARCH RECEBE TIPO NODO E TIPO INT COMO ARGUMENTOS*/
             //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
@@ -471,12 +471,12 @@ int main()
             paginada = 0;
             printf("Digite o nome do cargo:\n");
             scanf("%s", key_busca);
-            FILE* arqemp = fopen("empresas2.bin", "rb");
-            FILE* arqind = fopen("industria2.bin", "rb");
+            FILE* arqemp = fopen("empresas.bin", "rb");
+            FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
-            FILE* arqcarg = fopen("cargos2.bin", "rb");
-            FILE* arqloc = fopen("localizacao2.bin", "rb");
-            FILE* arqcrit = fopen("", "rb");
+            FILE* arqcarg = fopen("cargos.bin", "rb");
+            FILE* arqloc = fopen("localizacoes.bin", "rb");
+            FILE* arqcrit = fopen("criterios.bin", "rb");
 
             //faz um SearchTree na arvore de cargos e descobre a posicao de memoria
             // alc. Para isso a arvore deve estar feita.
@@ -859,7 +859,7 @@ int str_to_inteiro(char str[]){
         soma_ascii = soma_ascii valores[i];
     }
 
-    return soma_ascii
+    return soma_ascii;
 }
 
 
