@@ -6,9 +6,11 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+
 //--------------------------------------------------------------------
 // CONSTANTES
 //--------------------------------------------------------------------
+
 #define MAX_NOME_LENGTH 10000
 #define ORDER 2
 
@@ -23,18 +25,21 @@ typedef struct
     int id_cargo;
     long id_est_loc;
     long id_est_crit;
+
 }CARGO;
 
 typedef struct
 {
     char nome[1000];
     int id_ind;
+
 } INDUSTRIA;
 
 typedef struct
 {
     char nome[1000];
     int id_local;
+
 } LOCALIZACAO;
 
 typedef struct
@@ -44,6 +49,7 @@ typedef struct
     char yoe[100];
     char habilidades[MAX_NOME_LENGTH/2];
     int id_crit;
+
 } CRITERIOS;
 
 typedef struct
@@ -51,6 +57,7 @@ typedef struct
     int id_est_emp;
     int id_est_cargo;
     char data_criacao[100];
+
 } OFERTA;
 
 typedef struct
@@ -59,6 +66,7 @@ typedef struct
     char website[1000];
     int id_emp;
     long id_est_ind;
+
 } EMPRESA;
 
 typedef struct
@@ -74,6 +82,7 @@ typedef struct
     char habilidades[5000];
     char yoe[100];
     char data_criacao[100];
+
 } REGISTRO;
 
 // chave-posicao, armazena chave e posicao(indice) do registro que queremos
@@ -82,6 +91,7 @@ typedef struct keyPos
     int key;
     long pos;
     int encontrado; // pra que?
+
 } KEYPOS;
 
 // Definindo a estrutura de um nodo da arvore B
@@ -92,6 +102,7 @@ typedef struct node
     struct node *children[2 * ORDER];
     int num_keys;
     bool is_leaf;
+
 } Node;
 
 //--------------------------------------------------------------------
@@ -163,9 +174,14 @@ int main()
     LOCALIZACAO loc;
     CRITERIOS crit;
     REGISTRO reg;
-    //KEYPOS resultado;
+    KEYPOS resultado;
+
+    //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
+
+//--------  ARVORES B --------------------------------------------------------------------------------------------------------
 
     // MONTAR ARVORE NO INICIO DO PROGRAMA.
+
     Node* root_emp = NULL;
     Node* root_cargos = NULL;
     Node* root_ofertas_emp = NULL;
@@ -175,8 +191,6 @@ int main()
     FILE* arq_ofertas_emp;
     FILE* arq_ofertas_cargos;
     KEYPOS ch;
-
-
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
     arqem2 = fopen("empresas2.bin", "rb");
@@ -270,8 +284,7 @@ int main()
 
     /* A VARIAVEL root_ofertas_cargos É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE ofertas-cargos */
 
-    //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
-    // ESTAO LOGO ACIMA
+//--------------ARVORES B MONTADAS ACIMA ----------------------------------------------------------------------------------------
 
 
     //MENU DE OPCOES
@@ -309,7 +322,7 @@ int main()
             printf("(2) Cargos\n");
             scanf("%d", &op_busca);
         }
-        while(op_busca!=1 &&op_busca!=2);
+        while(op_busca!=1 && op_busca!=2);
         getchar();
         system("cls");
 
@@ -325,15 +338,22 @@ int main()
             FILE* arqloc = fopen("localizacao2.bin", "rb");
             FILE* arqcrit = fopen("", "rb");
 
+            /* A FUNCAO SEARCH RECEBE TIPO NODO E TIPO INT COMO ARGUMENTOS*/
             //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
-            resultado = search(emptree, key_busca); // nao sei se isso funciona
+            //resultado = search(emptree, key_busca); // nao sei se isso funciona
+            int key_busca_convertida;
+            key_busca_convertida = str_to_inteiro(key_busca);   // funcao converte a entrada
+            resultado = search(root_emp, key_busca_convertida);
+
             if (resultado == NULL)  // se a busca retornou NULL
             {
                 printf("Empresa nao encontrada\n");
             }
             else
             {
+
                 pos_emp = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                //pos_emp = pos_emp * sizeof(EMPRESA);
             }
 
             //le arquivo de empresas na posicao de memoria previamente encontrada e printa os campos
