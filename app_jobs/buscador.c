@@ -25,21 +25,18 @@ typedef struct
     int id_cargo;
     long id_est_loc;
     long id_est_crit;
-
 }CARGO;
 
 typedef struct
 {
     char nome[1000];
     int id_ind;
-
 } INDUSTRIA;
 
 typedef struct
 {
     char nome[1000];
     int id_local;
-
 } LOCALIZACAO;
 
 typedef struct
@@ -49,7 +46,6 @@ typedef struct
     char yoe[100];
     char habilidades[MAX_NOME_LENGTH/2];
     int id_crit;
-
 } CRITERIOS;
 
 typedef struct
@@ -57,7 +53,6 @@ typedef struct
     int id_est_emp;
     int id_est_cargo;
     char data_criacao[100];
-
 } OFERTA;
 
 typedef struct
@@ -66,7 +61,6 @@ typedef struct
     char website[1000];
     int id_emp;
     long id_est_ind;
-
 } EMPRESA;
 
 typedef struct
@@ -82,7 +76,6 @@ typedef struct
     char habilidades[5000];
     char yoe[100];
     char data_criacao[100];
-
 } REGISTRO;
 
 // chave-posicao, armazena chave e posicao(indice) do registro que queremos
@@ -91,7 +84,6 @@ typedef struct keyPos
     int key;
     long pos;
     int encontrado; // pra que?
-
 } KEYPOS;
 
 // Definindo a estrutura de um nodo da arvore B
@@ -102,7 +94,6 @@ typedef struct node
     struct node *children[2 * ORDER];
     int num_keys;
     bool is_leaf;
-
 } Node;
 
 //--------------------------------------------------------------------
@@ -174,7 +165,7 @@ int main()
     LOCALIZACAO loc;
     CRITERIOS crit;
     REGISTRO reg;
-    KEYPOS resultado;
+    KEYPOS *resultado;
 
     //AQUI PRECISA MONTAR AS ARVORE B PARA: empresa, ofertas(com chave sendo empresa), ofertas(com chave sendo cargo), cargo
 
@@ -193,11 +184,11 @@ int main()
     KEYPOS ch;
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
-    arqemp2 = fopen("empresas2.bin", "rb");
+    arqemp2 = fopen("empresas.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
     if (arqemp2 == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Erro ao abrir o arquivo de empresas.\n");
         return 1;
     }
 
@@ -215,11 +206,11 @@ int main()
     /* A VARIAVEL root_emp É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE EMPRESAS */
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de cargos.
-    arqcargos2 = fopen("cargos2.bin", "rb");
+    arqcargos2 = fopen("cargos.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
     if (arqcargos2 == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Erro ao abrir o arquivo de cargos.\n");
         return 1;
     }
 
@@ -241,7 +232,7 @@ int main()
 
     // Verificando se o arquivo foi aberto corretamente
     if (arq_ofertas_emp == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Erro ao abrir o arquivo de ofertas.\n");
         return 1;
     }
 
@@ -265,7 +256,7 @@ int main()
 
     // Verificando se o arquivo foi aberto corretamente
     if (arq_ofertas_cargos == NULL) {
-        printf("Erro ao abrir o arquivo.\n");
+        printf("Erro ao abrir o arquivo de ofertas.\n");
         return 1;
     }
 
@@ -340,10 +331,6 @@ int main()
             FILE* arqloc = fopen("localizacoes.bin", "rb");
             FILE* arqcrit = fopen("criterios.bin", "rb");
 
-            /* A FUNCAO SEARCH RECEBE TIPO NODO E TIPO INT COMO ARGUMENTOS*/
-            //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
-            //resultado = search(emptree, key_busca); // nao sei se isso funciona
-
             key_busca_convertida = str_to_inteiro(key_busca);   // funcao converte a entrada
             resultado = search(root_emp, key_busca_convertida);
 
@@ -354,7 +341,7 @@ int main()
             else
             {
 
-                pos_emp = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                pos_emp = resultado->pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
                 //pos_emp = pos_emp * sizeof(EMPRESA);
             }
 
@@ -383,8 +370,7 @@ int main()
 
             //faz searchtree na arvore de ofertas procurando pelo posicao de memoria da empresa e retorna a posicao de memoria do cargo correspondente, também guarda a data de criação
             //VER O TIPO DE LOOP AQUI (deve ser algo do tipo: enquanto existirem nodos com essa chave com "encontrado" = 0, faça)
-            do
-            {
+
                 resultado = search(root_ofertas_emp, pos_emp); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
                 {
@@ -392,9 +378,9 @@ int main()
                 }
                 else
                 {
-                    pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                    pos_oft = resultado->pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
                                              // é a posicao no arquivo de ofertas-empresas
-                    /* NAS ARVORES DE OFERTAS, AMBAS, EM .POS TEMOS OS INDICES NOS ARQUIVOS OFERTAS E NAO POSICAO.*/
+                    // NAS ARVORES DE OFERTAS, AMBAS, EM .POS TEMOS OS INDICES NOS ARQUIVOS OFERTAS E NAO POSICAO.
                     pos_oft = pos_oft*sizeof(OFERTA);
                 }
 
@@ -462,7 +448,7 @@ int main()
                     system("cls");
                     paginada = 0;
                 }
-            }while();
+
 
             fclose(arqemp);
             fclose(arqind);
@@ -497,7 +483,7 @@ int main()
             }
             else
             {
-                pos_carg = resultado.pos;
+                pos_carg = resultado->pos;
             }
 
             //le no arquivo de cargo nessa posicao e printa as informacoes
@@ -513,8 +499,7 @@ int main()
             }
 
             //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
-            do //definir esse laço que nem o do caso anterior
-            {
+
                 resultado = search(root_ofertas_cargos, pos_carg); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
                 {
@@ -522,7 +507,7 @@ int main()
                 }
                 else
                 {
-                    pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                    pos_oft = resultado->pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
                     /* O MESMO DO CASO PARA EMPRESAS, .POS SOMENTE TEM INDICE, LOGO TEMOS DE FAZER: */
                     pos_oft = pos_oft * sizeof(OFERTA);
                 }
@@ -599,8 +584,8 @@ int main()
                     system("cls");
                     paginada = 0;
                 }
-            }
-            while();
+
+
 
             fclose(arqemp);
             fclose(arqind);
@@ -608,8 +593,9 @@ int main()
             fclose(arqcarg);
             fclose(arqloc);
             fclose(arqcrit);
-            break;
+
         }
+        break;
 
     case 2:
 
@@ -867,11 +853,10 @@ int str_to_inteiro(char str[]){
 
     // Convertendo a string para inteiros com base nos valores ASCII dos caracteres
     for (int i = 0; str[i] != '\0'; i++) {
-        valores[i] = (int)str[i]; // Convertendo o caractere para seu valor ASCII
-        soma_ascii = soma_ascii valores[i];
+                                                // Convertendo o caractere para seu valor ASCII
+        soma_ascii = soma_ascii + (int)str[i];
     }
 
     return soma_ascii;
 }
-
 
