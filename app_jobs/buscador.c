@@ -326,6 +326,8 @@ int main()
         getchar();
         system("cls");
 
+        int key_busca_convertida; // PRA USAR COMO CHAVE NA FUNCAO DE SEARCH, POIS SO RECEBE INT E NAO STRING.
+
         if(op_busca==1)
         {
             paginada = 0;
@@ -341,7 +343,7 @@ int main()
             /* A FUNCAO SEARCH RECEBE TIPO NODO E TIPO INT COMO ARGUMENTOS*/
             //faz um "searchTree" para a tree de empresa e retorna a posicao de memoria dessa empresa
             //resultado = search(emptree, key_busca); // nao sei se isso funciona
-            int key_busca_convertida;
+
             key_busca_convertida = str_to_inteiro(key_busca);   // funcao converte a entrada
             resultado = search(root_emp, key_busca_convertida);
 
@@ -383,7 +385,7 @@ int main()
             //VER O TIPO DE LOOP AQUI (deve ser algo do tipo: enquanto existirem nodos com essa chave com "encontrado" = 0, faça)
             do
             {
-                resultado = search(ofttree, pos_emp); // nao sei se isso funciona
+                resultado = search(root_ofertas_emp, pos_emp); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
                 {
                     printf("Empresa nao encontrada\n");
@@ -391,7 +393,12 @@ int main()
                 else
                 {
                     pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                                             // é a posicao no arquivo de ofertas-empresas
+                    /* NAS ARVORES DE OFERTAS, AMBAS, EM .POS TEMOS OS INDICES NOS ARQUIVOS OFERTAS E NAO POSICAO.*/
+                    pos_oft = pos_oft*sizeof(OFERTA);
                 }
+
+
                 if(fseek(arqof, pos_oft, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de ofertas\n");
@@ -479,8 +486,11 @@ int main()
             FILE* arqcrit = fopen("criterios.bin", "rb");
 
             //faz um SearchTree na arvore de cargos e descobre a posicao de memoria
-            // alc. Para isso a arvore deve estar feita.
-            resultado = search(cargtree, key_busca);
+            // conversao para int eh importante, pois os valores chave das arvores sao inteiros.
+
+            key_busca_convertida = str_to_inteiro(key_busca);
+            resultado = search(root_cargos, key_busca_convertida);
+
             if (resultado == NULL)
             {
                 printf("Empresa nao encontrada\n");
@@ -505,7 +515,7 @@ int main()
             //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
             do //definir esse laço que nem o do caso anterior
             {
-                resultado = search(ofttree, pos_carg); // nao sei se isso funciona
+                resultado = search(root_ofertas_cargos, pos_carg); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
                 {
                     printf("Empresa nao encontrada\n");
@@ -513,6 +523,8 @@ int main()
                 else
                 {
                     pos_oft = resultado.pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
+                    /* O MESMO DO CASO PARA EMPRESAS, .POS SOMENTE TEM INDICE, LOGO TEMOS DE FAZER: */
+                    pos_oft = pos_oft * sizeof(OFERTA);
                 }
                 if (fseek(arqof, pos_oft, SEEK_SET) != 0)
                 {
