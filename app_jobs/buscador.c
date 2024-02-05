@@ -25,7 +25,7 @@ typedef struct
     int id_cargo;
     long id_est_loc;
     long id_est_crit;
-}CARGO;
+} CARGO;
 
 typedef struct
 {
@@ -187,13 +187,15 @@ int main()
     arqemp2 = fopen("empresas.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
-    if (arqemp2 == NULL) {
+    if (arqemp2 == NULL)
+    {
         printf("Erro ao abrir o arquivo de empresas.\n");
         return 1;
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
-    while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1) {
+    while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1)
+    {
         ch.key = str_to_inteiro(emp.nome);
         ch.pos = emp.id_emp; // id seria posicao(indice) da empresao no arquivo empresa?sim
         ch.encontrado = 0;
@@ -209,13 +211,15 @@ int main()
     arqcargos2 = fopen("cargos.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
-    if (arqcargos2 == NULL) {
+    if (arqcargos2 == NULL)
+    {
         printf("Erro ao abrir o arquivo de cargos.\n");
         return 1;
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
-    while (fread(&carg, sizeof(CARGO), 1, arqcargos2) == 1) {
+    while (fread(&carg, sizeof(CARGO), 1, arqcargos2) == 1)
+    {
         ch.key = str_to_inteiro(carg.nome);
         ch.pos = carg.id_cargo; // id seria posicao(indice) da cargo no arquivo empresa?sim
         ch.encontrado = 0;
@@ -231,14 +235,16 @@ int main()
     arq_ofertas_emp = fopen("ofertas.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
-    if (arq_ofertas_emp == NULL) {
+    if (arq_ofertas_emp == NULL)
+    {
         printf("Erro ao abrir o arquivo de ofertas.\n");
         return 1;
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
     int i = 0;
-    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_emp) == 1) {
+    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_emp) == 1)
+    {
         ch.key = oft.id_est_emp;
         ch.pos = i;             // posicao, indice no arquivo ofertas.bin
         ch.encontrado = 0;
@@ -255,14 +261,16 @@ int main()
     arq_ofertas_cargos = fopen("ofertas.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
-    if (arq_ofertas_cargos == NULL) {
+    if (arq_ofertas_cargos == NULL)
+    {
         printf("Erro ao abrir o arquivo de ofertas.\n");
         return 1;
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
     i = 0;
-    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_cargos) == 1) {
+    while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_cargos) == 1)
+    {
         ch.key = oft.id_est_cargo;
         ch.pos = i;             // posicao, indice no arquivo ofertas.bin
         ch.encontrado = 0;
@@ -340,36 +348,34 @@ int main()
             }
             else
             {
+                pos_emp = pos_emp * sizeof(EMPRESA);
 
-                pos_emp = resultado->pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
-                //pos_emp = pos_emp * sizeof(EMPRESA);
-            }
 
-            //le arquivo de empresas na posicao de memoria previamente encontrada e printa os campos
-            if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas\n");
-            }
-            else
-            {
-                fread(&emp, sizeof(EMPRESA), 1, arqemp);
-                strcpy(reg.nome_empresa, emp.nome);
-                strcpy(reg.website, emp.website);
-            }
+                //le arquivo de empresas na posicao de memoria previamente encontrada e printa os campos
+                if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas\n");
+                }
+                else
+                {
+                    fread(&emp, sizeof(EMPRESA), 1, arqemp);
+                    strcpy(reg.nome_empresa, emp.nome);
+                    strcpy(reg.website, emp.website);
+                }
 
-            //le arquivo de industrias na posicao empresa.id_est_ind e printa os campos
-            if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias\n");
-            }
-            else
-            {
-                fread(&ind, sizeof(INDUSTRIA), 1, arqind);
-                strcpy(reg.nome_industria, ind.nome);
-            }
+                //le arquivo de industrias na posicao empresa.id_est_ind e printa os campos
+                if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias\n");
+                }
+                else
+                {
+                    fread(&ind, sizeof(INDUSTRIA), 1, arqind);
+                    strcpy(reg.nome_industria, ind.nome);
+                }
 
-            //faz searchtree na arvore de ofertas procurando pelo posicao de memoria da empresa e retorna a posicao de memoria do cargo correspondente, também guarda a data de criação
-            //VER O TIPO DE LOOP AQUI (deve ser algo do tipo: enquanto existirem nodos com essa chave com "encontrado" = 0, faça)
+                //faz searchtree na arvore de ofertas procurando pelo posicao de memoria da empresa e retorna a posicao de memoria do cargo correspondente, também guarda a data de criação
+                //VER O TIPO DE LOOP AQUI (deve ser algo do tipo: enquanto existirem nodos com essa chave com "encontrado" = 0, faça)
 
                 resultado = search(root_ofertas_emp, pos_emp); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
@@ -378,10 +384,7 @@ int main()
                 }
                 else
                 {
-                    pos_oft = resultado->pos; // se a busca retornou uma posicao, pos_emp recebe essa posicao
-                                             // é a posicao no arquivo de ofertas-empresas
-                    // NAS ARVORES DE OFERTAS, AMBAS, EM .POS TEMOS OS INDICES NOS ARQUIVOS OFERTAS E NAO POSICAO.
-                    pos_oft = pos_oft*sizeof(OFERTA);
+                    pos_oft = resultado->pos*sizeof(OFERTA);
                 }
 
 
@@ -449,7 +452,7 @@ int main()
                     paginada = 0;
                 }
 
-
+            }
             fclose(arqemp);
             fclose(arqind);
             fclose(arqof);
@@ -484,21 +487,21 @@ int main()
             else
             {
                 pos_carg = resultado->pos;
-            }
 
-            //le no arquivo de cargo nessa posicao e printa as informacoes
-            if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
-            {
-                printf("Erro ao posicionar o ponteiro de arquivo no arquivo de cargos\n");
-            }
-            else
-            {
-                fread(&carg, sizeof(CARGO), 1, arqcarg);
-                strcpy(reg.nome_cargo, carg.nome);
-                strcpy(reg.descricao, carg.descricao);
-            }
 
-            //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
+                //le no arquivo de cargo nessa posicao e printa as informacoes
+                if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
+                {
+                    printf("Erro ao posicionar o ponteiro de arquivo no arquivo de cargos\n");
+                }
+                else
+                {
+                    fread(&carg, sizeof(CARGO), 1, arqcarg);
+                    strcpy(reg.nome_cargo, carg.nome);
+                    strcpy(reg.descricao, carg.descricao);
+                }
+
+                //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
 
                 resultado = search(root_ofertas_cargos, pos_carg); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
@@ -587,13 +590,14 @@ int main()
 
 
 
-            fclose(arqemp);
-            fclose(arqind);
-            fclose(arqof);
-            fclose(arqcarg);
-            fclose(arqloc);
-            fclose(arqcrit);
+                fclose(arqemp);
+                fclose(arqind);
+                fclose(arqof);
+                fclose(arqcarg);
+                fclose(arqloc);
+                fclose(arqcrit);
 
+            }
         }
         break;
 
@@ -848,12 +852,14 @@ KEYPOS* search(Node* root, int key)
 // ESSAS CHAVES SERAO USADAS NA ARVORE E TAMBEM NO MOMENTO APOS O USUARIO
 // DAR SUA ENTRADA.
 
-int str_to_inteiro(char str[]){
+int str_to_inteiro(char str[])
+{
     int soma_ascii = 0;
 
     // Convertendo a string para inteiros com base nos valores ASCII dos caracteres
-    for (int i = 0; str[i] != '\0'; i++) {
-                                                // Convertendo o caractere para seu valor ASCII
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        // Convertendo o caractere para seu valor ASCII
         soma_ascii = soma_ascii + (int)str[i];
     }
 
