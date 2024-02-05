@@ -19,6 +19,15 @@ typedef struct
     int id_local;
 } LOCALIZACAO;
 
+typedef struct
+{
+    char qualif[180];
+    char especializacao[180];
+    char yoe[50];
+    char habilidades[500];
+    int id_crit;
+} CRITERIOS;
+
 char *removerAspasDuplas(const char *str)
 {
     // Calcula o comprimento da string
@@ -75,7 +84,7 @@ void lerBinario(const char *nomeArquivoBinario)
 
     while (fread(&cargo, sizeof(CARGO), 1, arquivoBinario) == 1)
     {
-        printf("Nome:%s\nDescricao:%s\nID Cargo:%d\nID loc:%ld\n\n", cargo.nome, cargo.descricao, cargo.id_cargo, cargo.id_est_loc);
+        printf("Nome:%s\nDescricao:%s\nID Cargo:%d\nID loc:%ld\nID crit:%ld\n\n", cargo.nome, cargo.descricao, cargo.id_cargo, cargo.id_est_loc, cargo.id_est_crit);
     }
 
     fclose(arquivoBinario);
@@ -96,6 +105,9 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
     CARGO cargos;
     LOCALIZACAO local;
+    CRITERIOS crit;
+    char indice[15];
+    int num;
     char buffer[MAX_NOME_LENGTH];
     char linhaConcatenada[MAX_NOME_LENGTH];
     char chave[1000]; // Variável externa para armazenar a chave
@@ -198,19 +210,44 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
                 }
                 chave[i] = '\0';
+                indice[0] = temp[j+3];
+                indice[1] = '\0';
+                if(temp[j+4]!='\n'){
+                indice[1] = temp[j+4];
+                if(temp[j+5]!='\n'){
+                indice[2] = temp[j+5];
+                if(temp[j+6]!='\n'){
+                indice[3] = temp[j+6];
+                }
+                else indice[3] = '\0';
+                }else indice[2] = '\0';
+                }else indice[1] = '\0';
+                indice[4] = '\0';
             }
             else//e a localizacao nao
             {
                 for(i = 0; i < MAX_NOME_LENGTH; i++)
                 {
-                    if(temp[j]=='\n')
+                    if(temp[j]==',')
                         break;
                     chave[i] = temp[j];
                     j++;
 
                 }
                 chave[i] = '\0';
-
+                indice[0] = temp[j+1];
+                indice[1] = '\0';
+                if(temp[j+2]!='\n'){
+                indice[1] = temp[j+2];
+                if(temp[j+3]!='\n'){
+                indice[2] = temp[j+3];
+                if(temp[j+4]!='\n'){
+                indice[3] = temp[j+4];
+                }
+                else indice[3] = '\0';
+                }else indice[2] = '\0';
+                }else indice[1] = '\0';
+                indice[4] = '\0';
             }
         }
         else//se a descricao nao tem aspas
@@ -237,26 +274,62 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
                 }
                 chave[i] = '\0';
+                indice[0] = buffer[j+3];
+                indice[1] = '\0';
+                if(buffer[j+4]!='\n'){
+                indice[1] = buffer[j+4];
+                if(buffer[j+5]!='\n'){
+                indice[2] = buffer[j+5];
+                if(buffer[j+6]!='\n'){
+                indice[3] = buffer[j+6];
+                }
+                else indice[3] = '\0';
+                }else indice[2] = '\0';
+                }else indice[1] = '\0';
+                indice[4] = '\0';
             }
             else//e a localizacao nao
             {
                 for(i = 0; i < MAX_NOME_LENGTH; i++)
                 {
-                    if(buffer[j]=='\n')
+                    if(buffer[j]==',')
                         break;
                     chave[i] = buffer[j];
                     j++;
 
                 }
                 chave[i] = '\0';
-
+                indice[0] = buffer[j+1];
+                indice[1] = '\0';
+                if(buffer[j+2]!='\n'){
+                indice[1] = buffer[j+2];
+                if(buffer[j+3]!='\n'){
+                indice[2] = buffer[j+3];
+                if(buffer[j+4]!='\n'){
+                indice[3] = buffer[j+4];
+                }
+                else indice[3] = '\0';
+                }else indice[2] = '\0';
+                }else indice[3] = '\0';
+                indice[4] = '\0';
             }
         }
-
+        num = atoi(indice);
+        if(num == 2139){
+            cargos.id_est_crit = -1;
+            num--;
+        }
+        if(num == 2032){
+            cargos.id_est_crit = -1;
+            num--;
+        }
+        cargos.id_est_crit = num * sizeof(CRITERIOS);
         cargos.id_cargo = k;
+
         //acha a chave estrangeira
-        FILE *arquivo = fopen("localizacoes.bin", "rb");
+        FILE *arquivo = fopen("localizacao2.bin", "rb");
         FILE *arq = fopen("criterios.bin", "rb");
+
         int encontrado = 0;
         if (arquivo == NULL)
         {
@@ -277,27 +350,11 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
             else
                 cargos.id_est_loc = -1;
 
-        if (arq == NULL)
-        {
-            printf("Erro ao abrir o arquivo 'criterios.bin'\n");
-            return 1; // Ou outra ação apropriada em caso de erro
-        }
-        rewind(arq);
-        while (!feof(arq) && encontrado == 0)
-            if (fread(&crit, sizeof(CRITERIOS), 1, arq) == 1)
-            {
-                if (strcmp(, chave2)==0)
-                {
-                    encontrado = 1;
-                    fseek(arq, -sizeof(CRITERIOS), SEEK_CUR);
-                    cargos.id_est_crit = ftell(arq);
-                }
-            }
-            else
-                cargos.id_est_crit = -1;
-
-        fclose(arq);
         fclose(arquivo);
+        encontrado = 0;
+
+
+
         // Escreve no arquivo binário
         fwrite(&cargos, sizeof(CARGO), 1, arquivoBinario);
 
@@ -314,8 +371,8 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
 int main()
 {
-    const char *arquivoTexto = "cargos_t.txt";
-    const char *arquivoBinario = "cargos2.bin";
+    const char *arquivoTexto = "cargos_new.txt";
+    const char *arquivoBinario = "cargos.bin";
 
     // Escreve o arquivo binário a partir do arquivo de texto
     escreverBinario(arquivoTexto, arquivoBinario);
