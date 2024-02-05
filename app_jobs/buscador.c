@@ -179,7 +179,7 @@ int main()
 
 
     // INICIO DO PROCESSO DE MONTAGEM DA ARVORE B de empresa.
-    arqem2 = fopen("empresas2.bin", "rb");
+    arqemp2 = fopen("empresas2.bin", "rb");
 
     // Verificando se o arquivo foi aberto corretamente
     if (arqemp2 == NULL) {
@@ -190,7 +190,7 @@ int main()
     // Lendo os dados do arquivo binário e exibindo-os
     while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1) {
         ch.key = str_to_inteiro(emp.nome);
-        ch.pos = emp.id_emp // id seria posicao(indice) da empresao no arquivo empresa?sim
+        ch.pos = emp.id_emp; // id seria posicao(indice) da empresao no arquivo empresa?sim
         ch.encontrado = 0;
         insert(&root_emp, ch);
     }
@@ -212,7 +212,7 @@ int main()
     // Lendo os dados do arquivo binário e exibindo-os
     while (fread(&carg, sizeof(CARGO), 1, arqcargos2) == 1) {
         ch.key = str_to_inteiro(carg.nome);
-        ch.pos = carg.id_cargo // id seria posicao(indice) da cargo no arquivo empresa?sim
+        ch.pos = carg.id_cargo; // id seria posicao(indice) da cargo no arquivo empresa?sim
         ch.encontrado = 0;
         insert(&root_cargos, ch);
     }
@@ -232,7 +232,7 @@ int main()
     }
 
     // Lendo os dados do arquivo binário e exibindo-os
-    i = 0;
+    int i = 0;
     while (fread(&oft, sizeof(OFERTA), 1, arq_ofertas_emp) == 1) {
         ch.key = oft.id_est_emp;
         ch.pos = i;             // posicao, indice no arquivo ofertas.bin
@@ -839,7 +839,7 @@ int str_to_inteiro(char str[]){
         soma_ascii = soma_ascii valores[i];
     }
 
-    return soma_ascii
+    return soma_ascii;
 }
 
 
