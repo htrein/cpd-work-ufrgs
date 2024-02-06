@@ -196,10 +196,10 @@ void lerBinario(const char *nomeArquivoBinario)
 int main()
 {
     const char *arquivoTexto = "empresas_texto.txt";
-    const char *arquivoBinario = "empresas2.bin";
+    const char *arquivoBinario = "empresas.bin";
 
     // Escreve o arquivo binário a partir do arquivo de texto
-    escreverBinario(arquivoTexto, arquivoBinario);
+    //escreverBinario(arquivoTexto, arquivoBinario);
 
     // Lê e imprime os dados do arquivo binário
     lerBinario(arquivoBinario);

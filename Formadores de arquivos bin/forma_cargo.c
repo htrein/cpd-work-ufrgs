@@ -73,7 +73,7 @@ void removeQuebraLinha(char *str)
 void lerBinario(const char *nomeArquivoBinario)
 {
     FILE *arquivoBinario = fopen(nomeArquivoBinario, "rb");
-
+    int p =0;
     if (arquivoBinario == NULL)
     {
         perror("Erro ao abrir arquivo binário");
@@ -82,10 +82,12 @@ void lerBinario(const char *nomeArquivoBinario)
 
     CARGO cargo;
 
-    while (fread(&cargo, sizeof(CARGO), 1, arquivoBinario) == 1)
+    while (fread(&cargo, sizeof(CARGO), 1, arquivoBinario) == 1 && p < 200)
     {
+        p++;
         printf("Nome:%s\nDescricao:%s\nID Cargo:%d\nID loc:%ld\nID crit:%ld\n\n", cargo.nome, cargo.descricao, cargo.id_cargo, cargo.id_est_loc, cargo.id_est_crit);
     }
+
 
     fclose(arquivoBinario);
 }
@@ -327,7 +329,7 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
         cargos.id_cargo = k;
 
         //acha a chave estrangeira
-        FILE *arquivo = fopen("localizacao2.bin", "rb");
+        FILE *arquivo = fopen("localizacoes.bin", "rb");
         FILE *arq = fopen("criterios.bin", "rb");
 
         int encontrado = 0;
@@ -372,7 +374,7 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 int main()
 {
     const char *arquivoTexto = "cargos_new.txt";
-    const char *arquivoBinario = "cargos.bin";
+    const char *arquivoBinario = "cargos2.bin";
 
     // Escreve o arquivo binário a partir do arquivo de texto
     escreverBinario(arquivoTexto, arquivoBinario);

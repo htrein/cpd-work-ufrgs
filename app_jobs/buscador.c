@@ -41,10 +41,10 @@ typedef struct
 
 typedef struct
 {
-    char qualif[100];
-    char especializacao[100];
-    char yoe[100];
-    char habilidades[MAX_NOME_LENGTH/2];
+    char qualif[180];
+    char especializacao[180];
+    char yoe[50];
+    char habilidades[500];
     int id_crit;
 } CRITERIOS;
 
@@ -197,7 +197,7 @@ int main()
     while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1)
     {
         ch.key = str_to_inteiro(emp.nome);
-        ch.pos = emp.id_emp; // id seria posicao(indice) da empresao no arquivo empresa?sim
+        ch.pos = emp.id_emp; // id seria posicao(indice) da empresa no arquivo empresa?sim
         ch.encontrado = 0;
         insert(&root_emp, ch);
     }
@@ -331,7 +331,13 @@ int main()
         {
             paginada = 0;
             printf("Digite o nome da empresa:\n");
-            scanf("%s", key_busca);
+            fgets(key_busca, sizeof(key_busca), stdin);
+
+        // Remover o caractere de nova linha, se presente
+            int len = strlen(key_busca);
+            if (len > 0 && key_busca[len - 1] == '\n') {
+            key_busca[len - 1] = '\0'; // Substitui o caractere de nova linha por null terminator
+            }
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
@@ -345,16 +351,17 @@ int main()
             if (resultado == NULL)  // se a busca retornou NULL
             {
                 printf("Empresa nao encontrada\n");
+                break;
             }
             else
             {
-                pos_emp = pos_emp * sizeof(EMPRESA);
-
+                pos_emp = resultado->pos * sizeof(EMPRESA);
 
                 //le arquivo de empresas na posicao de memoria previamente encontrada e printa os campos
                 if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas\n");
+                    break;
                 }
                 else
                 {
@@ -367,6 +374,7 @@ int main()
                 if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias\n");
+                    break;
                 }
                 else
                 {
@@ -381,6 +389,7 @@ int main()
                 if (resultado == NULL)  // se a busca retornou NULL
                 {
                     printf("Empresa nao encontrada\n");
+                    break;
                 }
                 else
                 {
@@ -391,6 +400,7 @@ int main()
                 if(fseek(arqof, pos_oft, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de ofertas\n");
+                    break;
                 }
                 else
                 {
@@ -399,10 +409,10 @@ int main()
                     pos_carg = oft.id_est_cargo;
                 }
 
-                //le no arquivo de cargos na posicao de memoria previamente encontrada e printa os campos
                 if(fseek(arqcarg, pos_carg, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de cargos\n");
+                    break;
                 }
                 else
                 {
@@ -415,6 +425,7 @@ int main()
                 if(fseek(arqloc, carg.id_est_loc, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de localizacao\n");
+                    break;
                 }
                 else
                 {
@@ -426,6 +437,7 @@ int main()
                 if(fseek(arqcrit, carg.id_est_crit, SEEK_SET) != 0)
                 {
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de criterios\n");
+                    break;
                 }
                 else
                 {
@@ -466,7 +478,13 @@ int main()
 
             paginada = 0;
             printf("Digite o nome do cargo:\n");
-            scanf("%s", key_busca);
+            fgets(key_busca, sizeof(key_busca), stdin);
+
+        // Remover o caractere de nova linha, se presente
+            int len = strlen(key_busca);
+            if (len > 0 && key_busca[len - 1] == '\n') {
+            key_busca[len - 1] = '\0'; // Substitui o caractere de nova linha por null terminator
+            }
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
@@ -482,11 +500,11 @@ int main()
 
             if (resultado == NULL)
             {
-                printf("Empresa nao encontrada\n");
+                printf("Cargo nao encontrada\n");
             }
             else
             {
-                pos_carg = resultado->pos;
+                pos_carg = resultado->pos*sizeof(CARGO);
 
 
                 //le no arquivo de cargo nessa posicao e printa as informacoes
@@ -500,8 +518,6 @@ int main()
                     strcpy(reg.nome_cargo, carg.nome);
                     strcpy(reg.descricao, carg.descricao);
                 }
-
-                //faz um searchtree na arvore de ofertas e descobre o empresa.id e a data de criacao!!!
 
                 resultado = search(root_ofertas_cargos, pos_carg); // nao sei se isso funciona
                 if (resultado == NULL)  // se a busca retornou NULL
@@ -555,6 +571,7 @@ int main()
                 }
                 else
                 {
+
                     fread(&crit, sizeof(CRITERIOS), 1, arqcrit);
                     strcpy(reg.habilidades, crit.habilidades);
                     strcpy(reg.especializacao, crit.especializacao);
@@ -589,7 +606,7 @@ int main()
                 }
 
 
-
+            }
                 fclose(arqemp);
                 fclose(arqind);
                 fclose(arqof);
@@ -597,7 +614,7 @@ int main()
                 fclose(arqloc);
                 fclose(arqcrit);
 
-            }
+
         }
         break;
 

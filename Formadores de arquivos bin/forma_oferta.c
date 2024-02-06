@@ -258,59 +258,7 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
 
             }
         }
-        /*if(buffer[0] == '"')
-        {
 
-            for(i = 0; buffer[i+1]!='\"'||buffer[i+2]!=','; i++)
-            {
-                temp.empresa[i] = buffer[i+1];
-            }
-            temp.empresa[i] = '\0';
-            t = strlen(temp.empresa)+3;
-
-            if(buffer[t] == '"')
-            {
-                for(i = 0; buffer[t+1]!='\"'||buffer[t+2]!=','; i++,t++)
-                {
-                    temp.cargo[i] = buffer[t+1];
-                }
-                temp.cargo[i] = '\0';
-                k = t +3;
-            }
-            else
-            {
-                for(i = 0; buffer[t]!=','; i++,t++)
-                {
-                    temp.cargo[i] = buffer[t];
-                }
-                temp.cargo[i] = '\0';
-                k = t + 1;
-            }
-            for(i = 0; buffer[k]!=','; i++,k++)
-            {
-                temp.data[i] = buffer[k];
-            }
-            temp.data[i] = '\0';
-
-        }
-        else
-        {
-            sscanf(buffer, "%999[^,]", temp.empresa);
-            t = sizeof(temp.empresa)+1;
-            if(buffer[t]=='\"')
-            {
-                for(i = 0; buffer[t]!='\"'||buffer[t+1]!=','; i++,t++)
-                {
-                    temp.cargo[i] = buffer[t];
-                }
-                temp.cargo[i] = '\0';
-            }
-            else
-            {
-                sscanf(buffer, "%999[^,],%999[^,],%999[^,]", temp.empresa, temp.cargo, temp.data);
-            }
-        }
-        */
           //acha a chave estrangeira
           FILE *arqemp = fopen("empresas2.bin", "rb");
           FILE *arqcarg = fopen("cargos2.bin", "rb");
@@ -325,7 +273,6 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
           while (!feof(arqemp) && encontrado == 0)
               if (fread(&emp, sizeof(EMPRESA), 1, arqemp) == 1)
               {
-                  //printf("%s\n%s\n\n\n", temp.empresa, emp.nome);
                   if (strcmp(temp.empresa, emp.nome) == 0)
                   {
                       encontrado = 1;
