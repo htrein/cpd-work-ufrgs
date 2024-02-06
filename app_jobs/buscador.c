@@ -41,10 +41,10 @@ typedef struct
 
 typedef struct
 {
-    char qualif[100];
-    char especializacao[100];
-    char yoe[100];
-    char habilidades[MAX_NOME_LENGTH/2];
+    char qualif[180];
+    char especializacao[180];
+    char yoe[50];
+    char habilidades[500];
     int id_crit;
 } CRITERIOS;
 
@@ -168,9 +168,7 @@ int main()
     while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1)
     {
         ch.key = str_to_inteiro(emp.nome);
-
         ch.pos = emp.id_emp;
-
         ch.encontrado = 0;
         insert(&root_emp, ch);
     }
@@ -282,7 +280,6 @@ int main()
 
         if(op_busca=='1')
         {
-
             printf("Digite o nome da empresa:\n**exemplos: east india securities ltd., pearl global solutions, AxisTechnolabs**\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
@@ -291,7 +288,6 @@ int main()
             {
                 key_busca[len - 1] = '\0';
             }
-
 
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
@@ -304,22 +300,17 @@ int main()
             resultado = search(root_emp, key_busca_convertida);
             if (resultado == NULL)
             {
-
                 printf("Empresa nao registrada!\n");
                 break;
-
             }
             else
             {
-                pos_emp = pos_emp * sizeof(EMPRESA);
-
+                pos_emp = resultado->pos * sizeof(EMPRESA);
 
                 if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
                 {
-
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas!\n");
                     break;
-
                 }
                 else
                 {
@@ -330,17 +321,14 @@ int main()
 
                 if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
                 {
-
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias!\n");
                     break;
-
                 }
                 else
                 {
                     fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                     strcpy(reg.nome_industria, ind.nome);
                 }
-
 
                 char op_pag = '1';
                 while (op_pag == '1') //como existem mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
@@ -430,7 +418,6 @@ int main()
                         while (input_result != '1' && input_result != '2');
                         op_pag = input_result;
                     }
-
                 }
                 fclose(arqemp);
                 fclose(arqind);
@@ -443,7 +430,6 @@ int main()
         }
         else
         {
-
             printf("Digite o nome do cargo:\n**exemplos: Python Lead, Java Developer, UI Developer**\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
@@ -452,7 +438,6 @@ int main()
             {
                 key_busca[len - 1] = '\0'; // Substitui o caractere de nova linha por null terminator
             }
-
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
@@ -466,14 +451,12 @@ int main()
 
             if (resultado == NULL)
             {
-
                 printf("Cargo nao encontrado!\n");
                   break;
-
             }
             else
             {
-                pos_carg = resultado->pos;
+                pos_carg = resultado->pos*sizeof(CARGO);
 
                 if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
                 {
@@ -589,9 +572,7 @@ int main()
                         while (input_result != '1' && input_result != '2');
                         op_pag = input_result;
                     }
-
                 }
-
 
             }
             fclose(arqemp);
@@ -600,10 +581,10 @@ int main()
             fclose(arqcarg);
             fclose(arqloc);
             fclose(arqcrit);
-
         }
 
         break;
+
 
     case '2':
 
@@ -644,7 +625,7 @@ int main()
             }
 
             qsort(industria_e_chave, num_industrias, sizeof(INDUSTRIA), compara_industrias); // ordena (nesse caso, ordem alfabetica)
-            
+
             EMPRESA emp;
 
             for (int i = 0; i < num_industrias; i++) { // imprime cada vaga
