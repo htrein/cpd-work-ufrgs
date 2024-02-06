@@ -13,8 +13,8 @@ typedef struct
 
 typedef struct
 {
-    char empresa[500];
-    char cargo[500];
+    char empresa[1000];
+    char cargo[1000];
     char data[100];
 } TEMP;
 
@@ -24,6 +24,7 @@ typedef struct
     char descricao[MAX_NOME_LENGTH];
     int id_cargo;
     long id_est_loc;
+    long id_est_crit;
 } CARGO;
 
 typedef struct
@@ -57,7 +58,9 @@ void lerBinario(const char *nomeArquivoBinario)
 
     while (fread(&oft, sizeof(OFERTA), 1, arquivoBinario) == 1)
     {
+
         printf("Cargo: %ld\nEmpresa: %ld\nData de criacao: %s\n\n", oft.id_est_cargo, oft.id_est_emp, oft.data_criacao);
+
     }
 
     fclose(arquivoBinario);
@@ -260,8 +263,9 @@ void escreverBinario(const char *nomeArquivoTexto, const char *nomeArquivoBinari
         }
 
           //acha a chave estrangeira
-          FILE *arqemp = fopen("empresas2.bin", "rb");
-          FILE *arqcarg = fopen("cargos2.bin", "rb");
+          FILE *arqemp = fopen("empresas.bin", "rb");
+          FILE *arqcarg = fopen("cargos.bin", "rb");
+          //puts(temp.empresa);
           int encontrado = 0;
           if (arqemp == NULL)
           {
