@@ -102,7 +102,6 @@ typedef struct node
 
 Node* createNode();
 void splitChild(Node* parent, int index, Node* child);
-//void insert(Node** root, int key);
 void insert(Node** root, KEYPOS reg);
 void traverse(Node* root);
 KEYPOS* search(Node* root, int key);
@@ -244,17 +243,13 @@ int main()
 
     /* A VARIAVEL root_ofertas_cargos É UM PONTEIRO PARA O NODO RAIZ DA ARVORE B DE ofertas-cargos */
 
-
-    //////////////////TESTAR ISSO DAQUI PRA VER QUE ALGUNS ENCONTRADOS NÃO ESTÃO EM 0////////////
-    //printTree(root_ofertas_emp);
-
     //MENU DE OPCOES
     do
     {
         system("cls");
         printf("\t\t\t\t\t\t--JOBS SEARCH ENGINE--\n\n");
         printf("(1) Busca Rapida\n\n");
-        printf("(2) Classificacao\n\n");
+        printf("(2) (INDISPONIVEL)Classificacao\n\n");
         printf("=>");
         scanf("%c", &option);
     }
@@ -280,7 +275,7 @@ int main()
 
         if(op_busca=='1')
         {
-            printf("Digite o nome da empresa:\n**exemplos: east india securities ltd., pearl global solutions, AxisTechnolabs**\n\n");
+            printf("Digite o nome da empresa:\n**exemplos: east india securities ltd., GS LAB, pearl global solutions, AxisTechnolabs**\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
             int len = strlen(key_busca);
@@ -331,7 +326,7 @@ int main()
                 }
 
                 char op_pag = '1';
-                while (op_pag == '1') //como existem mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
+                while (op_pag == '1') //como existe mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
                 {                   //esse encadeamento de arquivos eh explicado no relatório do trabalho
                     int paginada = 0;
                     do
@@ -399,7 +394,7 @@ int main()
                                reg.nome_empresa, reg.website, reg.nome_industria, reg.nome_cargo, reg.data_criacao, reg.descricao, reg.nome_localizacao, reg.habilidades, reg.especializacao, reg.qualificacao, reg.yoe);
 
                     }
-                    while (resultado != NULL && paginada < 6);
+                    while (resultado != NULL && paginada < 2);
 
                     // Paginacao de resultados
                     if (resultado == NULL)
@@ -430,7 +425,7 @@ int main()
         }
         else
         {
-            printf("Digite o nome do cargo:\n**exemplos: Python Lead, Java Developer, UI Developer**\n\n");
+            printf("Digite o nome do cargo:\n**exemplos: Python Trainer, SDE 3 - Python, Java Microservice **\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
             int len = strlen(key_busca);
@@ -456,7 +451,7 @@ int main()
             }
             else
             {
-                pos_carg = resultado->pos*sizeof(CARGO);
+                pos_carg = resultado->pos * sizeof(CARGO);
 
                 if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
                 {
@@ -471,7 +466,7 @@ int main()
                 }
 
                 char op_pag = '1';
-                while (op_pag == '1')//como existem mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
+                while (op_pag == '1')//como existe mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
                 {                   //esse encadeamento de arquivos eh explicado no relatório do trabalho
                     int paginada = 0;
                     do
