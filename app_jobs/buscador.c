@@ -41,10 +41,10 @@ typedef struct
 
 typedef struct
 {
-    char qualif[180];
-    char especializacao[180];
-    char yoe[50];
-    char habilidades[500];
+    char qualif[100];
+    char especializacao[100];
+    char yoe[100];
+    char habilidades[MAX_NOME_LENGTH/2];
     int id_crit;
 } CRITERIOS;
 
@@ -107,6 +107,10 @@ void insert(Node** root, KEYPOS reg);
 void traverse(Node* root);
 KEYPOS* search(Node* root, int key);
 int str_to_inteiro(char str[]);
+int compara_industrias(const void *a, const void *b);
+int compara_industrias_contra(const void *a, const void *b);
+int compara_locs(const void *a, const void *b);
+int compara_locs_contra(const void *a, const void *b);
 
 //--------------------------------------------------------------------
 // MAIN FUNCTION
@@ -164,7 +168,9 @@ int main()
     while (fread(&emp, sizeof(EMPRESA), 1, arqemp2) == 1)
     {
         ch.key = str_to_inteiro(emp.nome);
+
         ch.pos = emp.id_emp;
+
         ch.encontrado = 0;
         insert(&root_emp, ch);
     }
@@ -276,6 +282,7 @@ int main()
 
         if(op_busca=='1')
         {
+
             printf("Digite o nome da empresa:\n**exemplos: east india securities ltd., pearl global solutions, AxisTechnolabs**\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
@@ -284,6 +291,7 @@ int main()
             {
                 key_busca[len - 1] = '\0';
             }
+
 
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
@@ -296,17 +304,22 @@ int main()
             resultado = search(root_emp, key_busca_convertida);
             if (resultado == NULL)
             {
+
                 printf("Empresa nao registrada!\n");
                 break;
+
             }
             else
             {
-                pos_emp = resultado->pos * sizeof(EMPRESA);
+                pos_emp = pos_emp * sizeof(EMPRESA);
+
 
                 if (fseek(arqemp, pos_emp, SEEK_SET) != 0)
                 {
+
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de empresas!\n");
                     break;
+
                 }
                 else
                 {
@@ -317,14 +330,17 @@ int main()
 
                 if(fseek(arqind, emp.id_est_ind, SEEK_SET) != 0)
                 {
+
                     printf("Erro ao posicionar o ponteiro de arquivo no arquivo de industrias!\n");
                     break;
+
                 }
                 else
                 {
                     fread(&ind, sizeof(INDUSTRIA), 1, arqind);
                     strcpy(reg.nome_industria, ind.nome);
                 }
+
 
                 char op_pag = '1';
                 while (op_pag == '1') //como existem mais de uma vaga sendo ofertada pela mesma empresa, aqui é um loop até todas as vagas sejam encontradas
@@ -414,6 +430,7 @@ int main()
                         while (input_result != '1' && input_result != '2');
                         op_pag = input_result;
                     }
+
                 }
                 fclose(arqemp);
                 fclose(arqind);
@@ -426,6 +443,7 @@ int main()
         }
         else
         {
+
             printf("Digite o nome do cargo:\n**exemplos: Python Lead, Java Developer, UI Developer**\n\n");
             fgets(key_busca, sizeof(key_busca), stdin);
             // Remover o caractere de nova linha presente na entrada do usuário
@@ -434,6 +452,7 @@ int main()
             {
                 key_busca[len - 1] = '\0'; // Substitui o caractere de nova linha por null terminator
             }
+
             FILE* arqemp = fopen("empresas.bin", "rb");
             FILE* arqind = fopen("industrias.bin", "rb");
             FILE* arqof = fopen("ofertas.bin", "rb");
@@ -447,12 +466,14 @@ int main()
 
             if (resultado == NULL)
             {
+
                 printf("Cargo nao encontrado!\n");
                   break;
+
             }
             else
             {
-                pos_carg = resultado->pos*sizeof(CARGO);
+                pos_carg = resultado->pos;
 
                 if (fseek(arqcarg, pos_carg, SEEK_SET) != 0)
                 {
@@ -568,7 +589,9 @@ int main()
                         while (input_result != '1' && input_result != '2');
                         op_pag = input_result;
                     }
+
                 }
+
 
             }
             fclose(arqemp);
@@ -577,6 +600,7 @@ int main()
             fclose(arqcarg);
             fclose(arqloc);
             fclose(arqcrit);
+
         }
 
         break;
@@ -598,11 +622,100 @@ int main()
 
         if(op_clas=='1')
         {
+            FILE* arqemp = fopen("empresas.bin", "rb");
+            FILE* arqind = fopen("industria.bin", "rb");
+            //FILE* arqof = fopen("ofertas.bin", "rb");
+            //FILE* arqcarg = fopen("cargos.bin", "rb");
+            //FILE* arqloc = fopen("localizacao.bin", "rb");
+            //FILE* arqcrit = fopen("criterios.bin", "rb");
 
+            fseek(arqind, 0, SEEK_END);
+            int num_industrias = ftell(arqind) / sizeof(INDUSTRIA); // numero de industrias no arquivo
+
+            fseek(arqind, 0, SEEK_SET); // move o ponteiro para o inicio do arquivo
+
+            INDUSTRIA* industria_e_chave = malloc(num_industrias * sizeof(INDUSTRIA));
+
+            for (int i = 0; i < num_industrias; i++) { // preenche o array com nome da industria e chave a partir do arquivo binario
+                {
+                    fread(industria_e_chave[i].nome, sizeof(industria_e_chave[i].nome), 1, arqind);
+                    fread(&industria_e_chave[i].id_ind, sizeof(industria_e_chave[i].id_ind), 1, arqind);
+                }
+            }
+
+            qsort(industria_e_chave, num_industrias, sizeof(INDUSTRIA), compara_industrias); // ordena (nesse caso, ordem alfabetica)
+            
+            EMPRESA emp;
+
+            for (int i = 0; i < num_industrias; i++) { // imprime cada vaga
+                while(fread(&emp, sizeof(EMPRESA), 1, arqemp) == 1) {
+                    if (emp.id_est_ind == industria_e_chave[i].id_ind) { // se a empresa for da industria em questao
+                        printf("Empresa: %s\nWebsite: %s\nIndustria: %s\n\n", emp.nome, emp.website, industria_e_chave[i].nome);
+                    }
+                }
+            }
+
+            fclose(arqemp);
+            fclose(arqind);
+            //fclose(arqof);
+            //fclose(arqcarg);
+            //fclose(arqloc);
+            //fclose(arqcrit);
+
+            free(industria_e_chave);
         }
         else
         {
+            FILE* arqemp = fopen("empresas.bin", "rb");
+            FILE* arqind = fopen("industria.bin", "rb");
+            FILE* arqof = fopen("ofertas.bin", "rb");
+            FILE* arqcarg = fopen("cargos.bin", "rb");
+            FILE* arqloc = fopen("localizacao.bin", "rb");
+            FILE* arqcrit = fopen("criterios.bin", "rb");
 
+            fseek(arqloc, 0, SEEK_END);
+            int num_locs = ftell(arqloc) / sizeof(LOCALIZACAO); // numero de industrias no arquivo
+
+            fseek(arqloc, 0, SEEK_SET); // move o ponteiro para o inicio do arquivo
+
+            LOCALIZACAO* loc_e_chave = malloc(num_locs * sizeof(LOCALIZACAO));
+
+            for (int i = 0; i < num_locs; i++) { // preenche o array com nome da industria e chave a partir do arquivo binario
+                {
+                    fread(loc_e_chave[i].nome, sizeof(loc_e_chave[i].nome), 1, arqloc);
+                    fread(&loc_e_chave[i].id_local, sizeof(loc_e_chave[i].id_local), 1, arqloc);
+                }
+            }
+
+            qsort(loc_e_chave, num_locs, sizeof(LOCALIZACAO), compara_locs); // ordena em ordem alfabetica
+
+            CARGO cargo;
+            OFERTA oferta;
+            int chave_cargo;
+
+            for (int i = 0; i < num_locs; i++) { // imprime cada vaga
+                while(fread(&cargo, sizeof(LOCALIZACAO), 1, arqloc) == 1) {
+                    if (cargo.id_est_loc == loc_e_chave[i].id_local) { // se o cargo for do local em questao
+                        printf("Cargo: %s\nDescricao: %s\nLocalizacao: %s\n", cargo.nome, cargo.descricao, loc_e_chave[i].nome);
+                        chave_cargo = cargo.id_cargo;
+
+                        while(fread(&oferta, sizeof(oferta), 1, arqof) == 1) { // usa a chave do cargo obtida para encontrar a data de criacao no arqof
+                            if (oferta.id_est_cargo == chave_cargo) { // procura a chave estrangeira do cargo
+                                printf("Data de criacao: %s\n", oferta.data_criacao);
+                            }
+                        }
+                    }
+                }
+            }
+
+            fclose(arqemp);
+            fclose(arqind);
+            fclose(arqof);
+            fclose(arqcarg);
+            fclose(arqloc);
+            fclose(arqcrit);
+
+            free(loc_e_chave);
         }
         break;
 
@@ -784,7 +897,9 @@ void traverse(Node* root)
         {
             traverse(root->children[i]);
             //printf("%d ", root->keys[i]);
+
             printf("ch:%d, pos:%d, enc:%d\n", root->registros[i].key, root->registros[i].pos, root->registros[i].encontrado );
+
         }
         traverse(root->children[i]);
     }
@@ -842,3 +957,26 @@ int str_to_inteiro(char str[])
     return soma_ascii;
 }
 
+int compara_industrias(const void *a, const void *b) {
+    INDUSTRIA* indA = (INDUSTRIA*)a;
+    INDUSTRIA* indB = (INDUSTRIA*)b;
+    return strcmp(indA->nome, indB->nome); // compara em ordem alfabetica
+}
+
+int compara_industrias_contra(const void *a, const void *b) {
+    INDUSTRIA* indA = (INDUSTRIA*)a;
+    INDUSTRIA* indB = (INDUSTRIA*)b;
+    return strcmp(indB->nome, indA->nome); // compara em ordem contra alfabetica
+}
+
+int compara_locs(const void *a, const void *b) {
+    LOCALIZACAO* locA = (LOCALIZACAO*)a;
+    LOCALIZACAO* locB = (LOCALIZACAO*)b;
+    return strcmp(locA->nome, locB->nome); // ordem alfabetica
+}
+
+int compara_locs_contra(const void *a, const void *b) {
+    LOCALIZACAO* locA = (LOCALIZACAO*)a;
+    LOCALIZACAO* locB = (LOCALIZACAO*)b;
+    return strcmp(locB->nome, locA->nome); // ordem contra alfabetica
+}
