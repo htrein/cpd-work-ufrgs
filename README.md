@@ -1,2 +1,2 @@
 # cpd-work-ufrgs
- organizando conjunto de dados bruto para fins de consulta, insercao , remocao e atualizacao. Os dados dizem respeito a oprtunidades de emprego.
+Organização de dados brutos para fim de consulta, inserção, remoção e atualização. 
